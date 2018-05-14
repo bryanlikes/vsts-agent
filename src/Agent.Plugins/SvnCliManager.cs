@@ -510,7 +510,7 @@ namespace Agent.Plugins.Repository
 
             // Add proxy setting parameters
             var agentProxy = _context.GetProxyConfiguration();
-            if (agentProxy != null && !string.IsNullOrEmpty(agentProxy.ProxyAddress) && !agentProxy.IsBypassed(_repository.Url))
+            if (agentProxy != null && !string.IsNullOrEmpty(agentProxy.ProxyAddress) && !agentProxy.WebProxy.IsBypassed(_repository.Url))
             {
                 _context.Debug($"Add proxy setting parameters to '{_svn}' for proxy server '{agentProxy.ProxyAddress}'.");
 

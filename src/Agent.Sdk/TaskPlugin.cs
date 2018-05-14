@@ -37,6 +37,7 @@ namespace Agent.Sdk
 
     public class AgentTaskPluginExecutionContext
     {
+        private VssConnection _connection;
         private readonly object _stdoutLock = new object();
 
         public AgentTaskPluginExecutionContext()
@@ -54,6 +55,63 @@ namespace Agent.Sdk
         public Dictionary<string, VariableValue> TaskVariables { get; set; }
         public Dictionary<string, string> Inputs { get; set; }
 
+        [JsonIgnore]
+        public VssConnection VssConnection
+        {
+            get
+            {
+                if (_connection == null)
+                {
+                    _connection = InitializeVssConnection();
+                }
+                return _connection;
+            }
+        }
+
+        public VssConnection InitializeVssConnection()
+        {
+            var headerValues = new List<ProductInfoHeaderValue>();
+            headerValues.Add(new ProductInfoHeaderValue($"VstsAgentCore-Plugin", Variables.GetValueOrDefault("agent.version")?.Value ?? "Unknown"));
+            headerValues.Add(new ProductInfoHeaderValue($"({RuntimeInformation.OSDescription.Trim()})"));
+
+            if (VssClientHttpRequestSettings.Default.UserAgent != null && VssClientHttpRequestSettings.Default.UserAgent.Count > 0)
+            {
+                headerValues.AddRange(VssClientHttpRequestSettings.Default.UserAgent);
+            }
+
+            VssClientHttpRequestSettings.Default.UserAgent = headerValues;
+
+            var certSetting = GetCertConfiguration();
+            if (certSetting != null)
+            {
+                if (!string.IsNullOrEmpty(certSetting.ClientCertificateArchiveFile))
+                {
+                    VssClientHttpRequestSettings.Default.ClientCertificateManager = new AgentClientCertificateManager(certSetting.ClientCertificateArchiveFile, certSetting.ClientCertificatePassword);
+                }
+
+                if (certSetting.SkipServerCertificateValidation)
+                {
+                    VssClientHttpRequestSettings.Default.ServerCertificateValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator;
+                }
+            }
+
+            var proxySetting = GetProxyConfiguration();
+            if (proxySetting != null)
+            {
+                if (!string.IsNullOrEmpty(proxySetting.ProxyAddress))
+                {
+                    VssHttpMessageHandler.DefaultWebProxy = new AgentWebProxy(proxySetting.ProxyAddress, proxySetting.ProxyUsername, proxySetting.ProxyPassword, proxySetting.ProxyBypassList);
+                }
+            }
+
+            ServiceEndpoint systemConnection = this.Endpoints.FirstOrDefault(e => string.Equals(e.Name, WellKnownServiceEndpointNames.SystemVssConnection, StringComparison.OrdinalIgnoreCase));
+            PluginUtil.NotNull(systemConnection, nameof(systemConnection));
+            PluginUtil.NotNull(systemConnection.Url, nameof(systemConnection.Url));
+
+            VssCredentials credentials = PluginUtil.GetVssCredential(systemConnection);
+            PluginUtil.NotNull(credentials, nameof(credentials));
+            return PluginUtil.CreateConnection(systemConnection.Url, credentials);
+        }
         public string GetInput(string name, bool required = false)
         {
             string value = null;
@@ -154,6 +212,8 @@ namespace Agent.Sdk
                     certConfig.ClientCertificatePrivateKeyFile = clientCertKey;
                     certConfig.ClientCertificateArchiveFile = clientCertArchive;
                     certConfig.ClientCertificatePassword = clientCertPassword;
+
+                    certConfig.VssClientCertificateManager = new AgentClientCertificateManager(clientCertArchive, clientCertPassword);
                 }
 
                 return certConfig;
@@ -178,6 +238,7 @@ namespace Agent.Sdk
                     ProxyUsername = proxyUsername,
                     ProxyPassword = proxyPassword,
                     ProxyBypassList = proxyBypassHosts,
+                    WebProxy = new AgentWebProxy(proxyUrl, proxyUsername, proxyPassword, proxyBypassHosts)
                 };
             }
             else

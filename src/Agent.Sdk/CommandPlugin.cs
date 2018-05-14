@@ -115,7 +115,7 @@ namespace Agent.Sdk
             {
                 if (!string.IsNullOrEmpty(certSetting.ClientCertificateArchiveFile))
                 {
-                    VssClientHttpRequestSettings.Default.ClientCertificateManager = new CommandPluginClientCertificateManager(certSetting.ClientCertificateArchiveFile, certSetting.ClientCertificatePassword);
+                    VssClientHttpRequestSettings.Default.ClientCertificateManager = new AgentClientCertificateManager(certSetting.ClientCertificateArchiveFile, certSetting.ClientCertificatePassword);
                 }
 
                 if (certSetting.SkipServerCertificateValidation)
@@ -129,7 +129,7 @@ namespace Agent.Sdk
             {
                 if (!string.IsNullOrEmpty(proxySetting.ProxyAddress))
                 {
-                    VssHttpMessageHandler.DefaultWebProxy = new CommandPluginWebProxy(proxySetting.ProxyAddress, proxySetting.ProxyUsername, proxySetting.ProxyPassword, proxySetting.ProxyBypassList);
+                    VssHttpMessageHandler.DefaultWebProxy = new AgentWebProxy(proxySetting.ProxyAddress, proxySetting.ProxyUsername, proxySetting.ProxyPassword, proxySetting.ProxyBypassList);
                 }
             }
 
@@ -174,98 +174,6 @@ namespace Agent.Sdk
             }
 
             return path;
-        }
-
-        private sealed class CommandPluginWebProxy : IWebProxy
-        {
-            private string _proxyAddress;
-            private readonly List<Regex> _regExBypassList = new List<Regex>();
-
-            public ICredentials Credentials { get; set; }
-
-            public CommandPluginWebProxy(string proxyAddress, string proxyUsername, string proxyPassword, List<string> proxyBypassList)
-            {
-                _proxyAddress = proxyAddress?.Trim();
-
-                if (string.IsNullOrEmpty(proxyUsername) || string.IsNullOrEmpty(proxyPassword))
-                {
-                    Credentials = CredentialCache.DefaultNetworkCredentials;
-                }
-                else
-                {
-                    Credentials = new NetworkCredential(proxyUsername, proxyPassword);
-                }
-
-                if (proxyBypassList != null)
-                {
-                    foreach (string bypass in proxyBypassList)
-                    {
-                        if (string.IsNullOrWhiteSpace(bypass))
-                        {
-                            continue;
-                        }
-                        else
-                        {
-                            try
-                            {
-                                Regex bypassRegex = new Regex(bypass.Trim(), RegexOptions.IgnoreCase | RegexOptions.CultureInvariant | RegexOptions.ECMAScript);
-                                _regExBypassList.Add(bypassRegex);
-                            }
-                            catch (Exception)
-                            {
-                                // eat all exceptions
-                            }
-                        }
-                    }
-                }
-            }
-
-            public Uri GetProxy(Uri destination)
-            {
-                if (IsBypassed(destination))
-                {
-                    return destination;
-                }
-                else
-                {
-                    return new Uri(_proxyAddress);
-                }
-            }
-
-            public bool IsBypassed(Uri uri)
-            {
-                return string.IsNullOrEmpty(_proxyAddress) || uri.IsLoopback || IsMatchInBypassList(uri);
-            }
-
-            private bool IsMatchInBypassList(Uri input)
-            {
-                string matchUriString = input.IsDefaultPort ?
-                    input.Scheme + "://" + input.Host :
-                    input.Scheme + "://" + input.Host + ":" + input.Port.ToString();
-
-                foreach (Regex r in _regExBypassList)
-                {
-                    if (r.IsMatch(matchUriString))
-                    {
-                        return true;
-                    }
-                }
-
-                return false;
-            }
-        }
-
-        private class CommandPluginClientCertificateManager : IVssClientCertificateManager
-        {
-            private readonly X509Certificate2Collection _clientCertificates = new X509Certificate2Collection();
-            public X509Certificate2Collection ClientCertificates => _clientCertificates;
-            public CommandPluginClientCertificateManager(string clientCertificateArchiveFile, string clientCertificatePassword)
-            {
-                if (!string.IsNullOrEmpty(clientCertificateArchiveFile))
-                {
-                    _clientCertificates.Add(new X509Certificate2(clientCertificateArchiveFile, clientCertificatePassword));
-                }
-            }
         }
 
         private AgentCertificateSettings GetCertConfiguration()

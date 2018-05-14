@@ -327,7 +327,7 @@ namespace Agent.Plugins.Repository
             // prepare credentail embedded urls
             repositoryUrlWithCred = PluginUtil.GetCredentialEmbeddedUrl(repositoryUrl, username, password);
             var agentProxy = executionContext.GetProxyConfiguration();
-            if (agentProxy != null && !string.IsNullOrEmpty(agentProxy.ProxyAddress) && !agentProxy.IsBypassed(repositoryUrl))
+            if (agentProxy != null && !string.IsNullOrEmpty(agentProxy.ProxyAddress) && !agentProxy.WebProxy.IsBypassed(repositoryUrl))
             {
                 proxyUrlWithCred = PluginUtil.GetCredentialEmbeddedUrl(new Uri(agentProxy.ProxyAddress), agentProxy.ProxyUsername, agentProxy.ProxyPassword);
 
@@ -592,7 +592,7 @@ namespace Agent.Plugins.Repository
                 }
 
                 // Prepare proxy config for fetch.
-                if (agentProxy != null && !string.IsNullOrEmpty(agentProxy.ProxyAddress) && !agentProxy.IsBypassed(repositoryUrl))
+                if (agentProxy != null && !string.IsNullOrEmpty(agentProxy.ProxyAddress) && !agentProxy.WebProxy.IsBypassed(repositoryUrl))
                 {
                     executionContext.Debug($"Config proxy server '{agentProxy.ProxyAddress}' for git fetch.");
                     PluginUtil.NotNullOrEmpty(proxyUrlWithCredString, nameof(proxyUrlWithCredString));
@@ -764,7 +764,7 @@ namespace Agent.Plugins.Repository
                     }
 
                     // Prepare proxy config for submodule update.
-                    if (agentProxy != null && !string.IsNullOrEmpty(agentProxy.ProxyAddress) && !agentProxy.IsBypassed(repositoryUrl))
+                    if (agentProxy != null && !string.IsNullOrEmpty(agentProxy.ProxyAddress) && !agentProxy.WebProxy.IsBypassed(repositoryUrl))
                     {
                         executionContext.Debug($"Config proxy server '{agentProxy.ProxyAddress}' for git submodule update.");
                         PluginUtil.NotNullOrEmpty(proxyUrlWithCredString, nameof(proxyUrlWithCredString));
@@ -840,7 +840,7 @@ namespace Agent.Plugins.Repository
                 if (exposeCred)
                 {
                     // save proxy setting to git config.
-                    if (agentProxy != null && !string.IsNullOrEmpty(agentProxy.ProxyAddress) && !agentProxy.IsBypassed(repositoryUrl))
+                    if (agentProxy != null && !string.IsNullOrEmpty(agentProxy.ProxyAddress) && !agentProxy.WebProxy.IsBypassed(repositoryUrl))
                     {
                         executionContext.Debug($"Save proxy config for proxy server '{agentProxy.ProxyAddress}' into git config.");
                         PluginUtil.NotNullOrEmpty(proxyUrlWithCredString, nameof(proxyUrlWithCredString));

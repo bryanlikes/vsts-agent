@@ -45,7 +45,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.Build
 
             // Setup proxy.
             var agentProxy = HostContext.GetService<IVstsAgentWebProxy>();
-            if (!string.IsNullOrEmpty(executionContext.Variables.Agent_ProxyUrl) && !agentProxy.IsBypassed(endpoint.Url))
+            if (!string.IsNullOrEmpty(executionContext.Variables.Agent_ProxyUrl) && !agentProxy.WebProxy.IsBypassed(endpoint.Url))
             {
                 executionContext.Debug($"Configure '{tf.FilePath}' to work through proxy server '{executionContext.Variables.Agent_ProxyUrl}'.");
                 tf.SetupProxy(executionContext.Variables.Agent_ProxyUrl, executionContext.Variables.Agent_ProxyUsername, executionContext.Variables.Agent_ProxyPassword);
@@ -407,7 +407,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.Build
             }
 
             // Cleanup proxy settings.
-            if (!string.IsNullOrEmpty(executionContext.Variables.Agent_ProxyUrl) && !agentProxy.IsBypassed(endpoint.Url))
+            if (!string.IsNullOrEmpty(executionContext.Variables.Agent_ProxyUrl) && !agentProxy.WebProxy.IsBypassed(endpoint.Url))
             {
                 executionContext.Debug($"Remove proxy setting for '{tf.FilePath}' to work through proxy server '{executionContext.Variables.Agent_ProxyUrl}'.");
                 tf.CleanupProxySetting();

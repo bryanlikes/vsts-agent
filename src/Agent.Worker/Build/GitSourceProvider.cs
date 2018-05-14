@@ -374,7 +374,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.Build
             // prepare credentail embedded urls
             _repositoryUrlWithCred = UrlUtil.GetCredentialEmbeddedUrl(repositoryUrl, username, password);
             var agentProxy = HostContext.GetService<IVstsAgentWebProxy>();
-            if (!string.IsNullOrEmpty(executionContext.Variables.Agent_ProxyUrl) && !agentProxy.IsBypassed(repositoryUrl))
+            if (!string.IsNullOrEmpty(executionContext.Variables.Agent_ProxyUrl) && !agentProxy.WebProxy.IsBypassed(repositoryUrl))
             {
                 _proxyUrlWithCred = UrlUtil.GetCredentialEmbeddedUrl(new Uri(executionContext.Variables.Agent_ProxyUrl), executionContext.Variables.Agent_ProxyUsername, executionContext.Variables.Agent_ProxyPassword);
 
@@ -482,7 +482,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.Build
                         executionContext.Debug(ex.ToString());
                     }
                 }
-                
+
                 // delete the shallow.lock file left by previous canceled build or any operation cause git.exe crash last time.
                 string shallowLockFile = Path.Combine(targetPath, ".git\\shallow.lock");
                 if (File.Exists(shallowLockFile))
@@ -640,7 +640,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.Build
                 }
 
                 // Prepare proxy config for fetch.
-                if (!string.IsNullOrEmpty(executionContext.Variables.Agent_ProxyUrl) && !agentProxy.IsBypassed(repositoryUrl))
+                if (!string.IsNullOrEmpty(executionContext.Variables.Agent_ProxyUrl) && !agentProxy.WebProxy.IsBypassed(repositoryUrl))
                 {
                     executionContext.Debug($"Config proxy server '{executionContext.Variables.Agent_ProxyUrl}' for git fetch.");
                     ArgUtil.NotNullOrEmpty(_proxyUrlWithCredString, nameof(_proxyUrlWithCredString));
@@ -811,7 +811,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.Build
                     }
 
                     // Prepare proxy config for submodule update.
-                    if (!string.IsNullOrEmpty(executionContext.Variables.Agent_ProxyUrl) && !agentProxy.IsBypassed(repositoryUrl))
+                    if (!string.IsNullOrEmpty(executionContext.Variables.Agent_ProxyUrl) && !agentProxy.WebProxy.IsBypassed(repositoryUrl))
                     {
                         executionContext.Debug($"Config proxy server '{executionContext.Variables.Agent_ProxyUrl}' for git submodule update.");
                         ArgUtil.NotNullOrEmpty(_proxyUrlWithCredString, nameof(_proxyUrlWithCredString));
@@ -887,7 +887,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.Build
                 if (exposeCred)
                 {
                     // save proxy setting to git config.
-                    if (!string.IsNullOrEmpty(executionContext.Variables.Agent_ProxyUrl) && !agentProxy.IsBypassed(repositoryUrl))
+                    if (!string.IsNullOrEmpty(executionContext.Variables.Agent_ProxyUrl) && !agentProxy.WebProxy.IsBypassed(repositoryUrl))
                     {
                         executionContext.Debug($"Save proxy config for proxy server '{executionContext.Variables.Agent_ProxyUrl}' into git config.");
                         ArgUtil.NotNullOrEmpty(_proxyUrlWithCredString, nameof(_proxyUrlWithCredString));

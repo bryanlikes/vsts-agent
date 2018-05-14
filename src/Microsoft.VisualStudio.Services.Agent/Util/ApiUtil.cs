@@ -25,8 +25,8 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
             }
 
             VssClientHttpRequestSettings.Default.UserAgent = headerValues;
-            VssClientHttpRequestSettings.Default.ClientCertificateManager = certSetting;
-            VssHttpMessageHandler.DefaultWebProxy = proxySetting;
+            VssClientHttpRequestSettings.Default.ClientCertificateManager = certSetting.VssClientCertificateManager;
+            VssHttpMessageHandler.DefaultWebProxy = proxySetting.WebProxy;
         }
 
         public static VssConnection CreateConnection(Uri serverUri, VssCredentials credentials, IEnumerable<DelegatingHandler> additionalDelegatingHandler = null)

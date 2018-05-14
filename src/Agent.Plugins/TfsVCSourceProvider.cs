@@ -55,7 +55,7 @@ namespace Agent.Plugins.Repository
 
             // Setup proxy.
             var agentProxy = executionContext.GetProxyConfiguration();
-            if (agentProxy != null && !string.IsNullOrEmpty(agentProxy.ProxyAddress) && !agentProxy.IsBypassed(repository.Url))
+            if (agentProxy != null && !string.IsNullOrEmpty(agentProxy.ProxyAddress) && !agentProxy.WebProxy.IsBypassed(repository.Url))
             {
                 executionContext.Debug($"Configure '{tf.FilePath}' to work through proxy server '{agentProxy.ProxyAddress}'.");
                 tf.SetupProxy(agentProxy.ProxyAddress, agentProxy.ProxyUsername, agentProxy.ProxyPassword);
@@ -419,7 +419,7 @@ namespace Agent.Plugins.Repository
             }
 
             // Cleanup proxy settings.
-            if (agentProxy != null && !string.IsNullOrEmpty(agentProxy.ProxyAddress) && !agentProxy.IsBypassed(repository.Url))
+            if (agentProxy != null && !string.IsNullOrEmpty(agentProxy.ProxyAddress) && !agentProxy.WebProxy.IsBypassed(repository.Url))
             {
                 executionContext.Debug($"Remove proxy setting for '{tf.FilePath}' to work through proxy server '{agentProxy.ProxyAddress}'.");
                 tf.CleanupProxySetting();

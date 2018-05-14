@@ -36,6 +36,7 @@ namespace Agent.Sdk
         public string ClientCertificatePrivateKeyFile { get; set; }
         public string ClientCertificateArchiveFile { get; set; }
         public string ClientCertificatePassword { get; set; }
+        public IVssClientCertificateManager VssClientCertificateManager { get; set; }
     }
 
     public class AgentWebProxySettings
@@ -44,46 +45,7 @@ namespace Agent.Sdk
         public string ProxyUsername { get; set; }
         public string ProxyPassword { get; set; }
         public List<string> ProxyBypassList { get; set; }
-
-        private readonly List<Regex> _regExBypassList = new List<Regex>();
-        private bool _initialized = false;
-        public bool IsBypassed(Uri uri)
-        {
-            return string.IsNullOrEmpty(ProxyAddress) || uri.IsLoopback || IsMatchInBypassList(uri);
-        }
-
-        private bool IsMatchInBypassList(Uri input)
-        {
-            string matchUriString = input.IsDefaultPort ?
-                input.Scheme + "://" + input.Host :
-                input.Scheme + "://" + input.Host + ":" + input.Port.ToString();
-
-            if (!_initialized)
-            {
-                InitializeBypassList();
-            }
-
-            foreach (Regex r in _regExBypassList)
-            {
-                if (r.IsMatch(matchUriString))
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        private void InitializeBypassList()
-        {
-            foreach (string bypass in ProxyBypassList)
-            {
-                Regex bypassRegex = new Regex(bypass, RegexOptions.IgnoreCase | RegexOptions.CultureInvariant | RegexOptions.ECMAScript);
-                _regExBypassList.Add(bypassRegex);
-            }
-
-            _initialized = true;
-        }
+        public IWebProxy WebProxy { get; set; }
     }
 
     public static class PluginUtil

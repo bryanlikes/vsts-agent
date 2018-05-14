@@ -455,7 +455,7 @@ namespace Microsoft.VisualStudio.Services.Agent
         {
             HttpClientHandler clientHandler = new HttpClientHandler();
             var agentWebProxy = context.GetService<IVstsAgentWebProxy>();
-            clientHandler.Proxy = agentWebProxy;
+            clientHandler.Proxy = agentWebProxy.WebProxy;
             return clientHandler;
         }
     }
