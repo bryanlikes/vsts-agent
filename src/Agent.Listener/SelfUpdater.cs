@@ -257,7 +257,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener
             // for windows service back compat with old windows agent, we need make sure the servicehost.exe is still the old name
             // if the current bin folder has VsoAgentService.exe, then the new agent bin folder needs VsoAgentService.exe as well
 #if OS_WINDOWS
-            if (File.Exists(Path.Combine(IOUtil.GetBinPath(), "VsoAgentService.exe")))
+            if (File.Exists(Path.Combine(HostContext.GetDirectory(WellKnownDirectory.Bin), "VsoAgentService.exe")))
             {
                 Trace.Info($"Make a copy of AgentService.exe, name it VsoAgentService.exe");
                 File.Copy(Path.Combine(binVersionDir, "AgentService.exe"), Path.Combine(binVersionDir, "VsoAgentService.exe"), true);
@@ -388,7 +388,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener
             string scriptName = "_update.sh";
 #endif
 
-            string updateScript = Path.Combine(IOUtil.GetWorkPath(HostContext), scriptName);
+            string updateScript = Path.Combine(HostContext.GetDirectory(WellKnownDirectory.Work), scriptName);
             if (File.Exists(updateScript))
             {
                 IOUtil.DeleteFile(updateScript);

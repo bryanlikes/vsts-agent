@@ -63,7 +63,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener
                     Directory.GetFiles(Directory.GetCurrentDirectory())
                     .Where((string filePath) =>
                     {
-                        return filePath.EndsWith(".yml", IOUtil.FilePathStringComparison);
+                        return filePath.EndsWith(".yml", StringComparison.OrdinalIgnoreCase);
                     })
                     .ToArray();
                 if (ymlFiles.Length > 1)
@@ -414,7 +414,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener
       }}
     ],
     ""variables"": {{");
-                        builder.Append($@"
+                    builder.Append($@"
       ""system"": ""build"",
       ""system.collectionId"": ""00000000-0000-0000-0000-000000000000"",
       ""system.culture"": ""en-US"",
@@ -500,7 +500,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener
             if (_gitPath == null)
             {
 #if OS_WINDOWS
-                _gitPath = Path.Combine(IOUtil.GetExternalsPath(), "git", "cmd", $"git{IOUtil.ExeExtension}");
+                _gitPath = Path.Combine(HostContext.GetDirectory(WellKnownDirectory.Externals), "git", "cmd", $"git{IOUtil.ExeExtension}");
                 ArgUtil.File(_gitPath, nameof(_gitPath));
 #else
                 var whichUtil = HostContext.GetService<IWhichUtil>();
@@ -778,7 +778,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener
                                         _term.WriteLine($"Task definition is invalid. The name property must not be empty and the version property must not be null. Task definition: {taskJsonPath}");
                                         continue;
                                     }
-                                    else if (!string.Equals(taskSubDirectory, GetTaskDirectory(definition), IOUtil.FilePathStringComparison))
+                                    else if (!string.Equals(taskSubDirectory, GetTaskDirectory(definition), StringComparison.OrdinalIgnoreCase))
                                     {
                                         _term.WriteLine($"Task definition does not match the expected folder structure. Expected: '{GetTaskDirectory(definition)}'; actual: '{taskJsonPath}'");
                                         continue;

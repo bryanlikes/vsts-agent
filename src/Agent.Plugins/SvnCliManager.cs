@@ -11,6 +11,7 @@ using Microsoft.TeamFoundation.Build.WebApi;
 using Microsoft.TeamFoundation.DistributedTask.WebApi;
 using Agent.Sdk;
 using Pipelines = Microsoft.TeamFoundation.DistributedTask.Pipelines;
+using Microsoft.VisualStudio.Services.Agent.Util;
 
 namespace Agent.Plugins.Repository
 {
@@ -28,19 +29,19 @@ namespace Agent.Plugins.Repository
             CancellationToken cancellationToken)
         {
             // Validation.
-            PluginUtil.NotNull(context, nameof(context));
-            PluginUtil.NotNull(repository, nameof(repository));
-            PluginUtil.NotNull(cancellationToken, nameof(cancellationToken));
+            ArgUtil.NotNull(context, nameof(context));
+            ArgUtil.NotNull(repository, nameof(repository));
+            ArgUtil.NotNull(cancellationToken, nameof(cancellationToken));
 
-            PluginUtil.NotNull(repository.Url, nameof(repository.Url));
-            PluginUtil.Equal(true, repository.Url.IsAbsoluteUri, nameof(repository.Url.IsAbsoluteUri));
+            ArgUtil.NotNull(repository.Url, nameof(repository.Url));
+            ArgUtil.Equal(true, repository.Url.IsAbsoluteUri, nameof(repository.Url.IsAbsoluteUri));
 
-            PluginUtil.NotNull(repository.Endpoint, nameof(repository.Endpoint));
+            ArgUtil.NotNull(repository.Endpoint, nameof(repository.Endpoint));
             ServiceEndpoint endpoint = context.Endpoints.Single(x => x.Id == repository.Endpoint.Id);
-            PluginUtil.NotNull(endpoint.Data, nameof(endpoint.Data));
-            PluginUtil.NotNull(endpoint.Authorization, nameof(endpoint.Authorization));
-            PluginUtil.NotNull(endpoint.Authorization.Parameters, nameof(endpoint.Authorization.Parameters));
-            PluginUtil.Equal(EndpointAuthorizationSchemes.UsernamePassword, endpoint.Authorization.Scheme, nameof(endpoint.Authorization.Scheme));
+            ArgUtil.NotNull(endpoint.Data, nameof(endpoint.Data));
+            ArgUtil.NotNull(endpoint.Authorization, nameof(endpoint.Authorization));
+            ArgUtil.NotNull(endpoint.Authorization.Parameters, nameof(endpoint.Authorization.Parameters));
+            ArgUtil.Equal(EndpointAuthorizationSchemes.UsernamePassword, endpoint.Authorization.Scheme, nameof(endpoint.Authorization.Scheme));
 
             _context = context;
             _repository = repository;
@@ -51,7 +52,7 @@ namespace Agent.Plugins.Repository
 
             if (string.IsNullOrEmpty(svnPath))
             {
-                throw new Exception(PluginUtil.Loc("SvnNotInstalled"));
+                throw new Exception(StringUtil.Loc("SvnNotInstalled"));
             }
             else
             {
@@ -63,7 +64,7 @@ namespace Agent.Plugins.Repository
             endpoint.Authorization.Parameters.TryGetValue(EndpointAuthorizationParameters.Username, out _username);
             endpoint.Authorization.Parameters.TryGetValue(EndpointAuthorizationParameters.Password, out _password);
 
-            _acceptUntrusted = PluginUtil.ConvertToBoolean(repository.Properties.Get<string>(EndpointData.SvnAcceptUntrustedCertificates));
+            _acceptUntrusted = StringUtil.ConvertToBoolean(repository.Properties.Get<string>(EndpointData.SvnAcceptUntrustedCertificates));
         }
 
         /// <summary>
@@ -119,7 +120,7 @@ namespace Agent.Plugins.Repository
         {
             if (File.Exists(rootPath))
             {
-                throw new Exception(PluginUtil.Loc("SvnFileAlreadyExists", rootPath));
+                throw new Exception(StringUtil.Loc("SvnFileAlreadyExists", rootPath));
             }
 
             Dictionary<string, Uri> mappings = new Dictionary<string, Uri>();
@@ -218,14 +219,14 @@ namespace Agent.Plugins.Repository
             // The command returns a non-zero exit code if the source revision is not found.
             // The assertions performed here should never fail.
             XmlSerializer serializer = new XmlSerializer(typeof(SvnInfo));
-            PluginUtil.NotNullOrEmpty(xml, nameof(xml));
+            ArgUtil.NotNullOrEmpty(xml, nameof(xml));
 
             using (StringReader reader = new StringReader(xml))
             {
                 SvnInfo info = serializer.Deserialize(reader) as SvnInfo;
-                PluginUtil.NotNull(info, nameof(info));
-                PluginUtil.NotNull(info.Entries, nameof(info.Entries));
-                PluginUtil.Equal(1, info.Entries.Length, nameof(info.Entries.Length));
+                ArgUtil.NotNull(info, nameof(info));
+                ArgUtil.NotNull(info.Entries, nameof(info.Entries));
+                ArgUtil.Equal(1, info.Entries.Length, nameof(info.Entries.Length));
 
                 long revision = 0;
                 long.TryParse(info.Entries[0].Commit?.Revision ?? sourceRevision, out revision);
@@ -242,7 +243,7 @@ namespace Agent.Plugins.Repository
         /// <returns></returns>
         public string ResolveServerPath(string serverPath, string rootPath)
         {
-            PluginUtil.Equal(true, serverPath.StartsWith(@"^/"), nameof(serverPath));
+            ArgUtil.Equal(true, serverPath.StartsWith(@"^/"), nameof(serverPath));
 
             foreach (string workingDirectoryPath in GetSvnWorkingCopyPaths(rootPath))
             {
@@ -259,14 +260,14 @@ namespace Agent.Plugins.Repository
                     // The command returns a non-zero exit code if the local path is not a working copy.
                     // The assertions performed here should never fail.
                     XmlSerializer serializer = new XmlSerializer(typeof(SvnInfo));
-                    PluginUtil.NotNullOrEmpty(xml, nameof(xml));
+                    ArgUtil.NotNullOrEmpty(xml, nameof(xml));
 
                     using (StringReader reader = new StringReader(xml))
                     {
                         SvnInfo info = serializer.Deserialize(reader) as SvnInfo;
-                        PluginUtil.NotNull(info, nameof(info));
-                        PluginUtil.NotNull(info.Entries, nameof(info.Entries));
-                        PluginUtil.Equal(1, info.Entries.Length, nameof(info.Entries.Length));
+                        ArgUtil.NotNull(info, nameof(info));
+                        ArgUtil.NotNull(info.Entries, nameof(info.Entries));
+                        ArgUtil.Equal(1, info.Entries.Length, nameof(info.Entries.Length));
 
                         if (serverPath.Equals(info.Entries[0].RelativeUrl, StringComparison.Ordinal) || serverPath.StartsWith(info.Entries[0].RelativeUrl + '/', StringComparison.Ordinal))
                         {
@@ -305,14 +306,14 @@ namespace Agent.Plugins.Repository
                 // The command returns a non-zero exit code if the local path is not a working copy.
                 // The assertions performed here should never fail.
                 XmlSerializer serializer = new XmlSerializer(typeof(SvnInfo));
-                PluginUtil.NotNullOrEmpty(xml, nameof(xml));
+                ArgUtil.NotNullOrEmpty(xml, nameof(xml));
 
                 using (StringReader reader = new StringReader(xml))
                 {
                     SvnInfo info = serializer.Deserialize(reader) as SvnInfo;
-                    PluginUtil.NotNull(info, nameof(info));
-                    PluginUtil.NotNull(info.Entries, nameof(info.Entries));
-                    PluginUtil.Equal(1, info.Entries.Length, nameof(info.Entries.Length));
+                    ArgUtil.NotNull(info, nameof(info));
+                    ArgUtil.NotNull(info.Entries, nameof(info.Entries));
+                    ArgUtil.Equal(1, info.Entries.Length, nameof(info.Entries.Length));
 
                     return new Uri(info.Entries[0].Url);
                 }
@@ -479,7 +480,7 @@ namespace Agent.Plugins.Repository
                     // Validate the arg.
                     if (arg.IndexOfAny(new char[] { '"', '\r', '\n' }) >= 0)
                     {
-                        throw new Exception(PluginUtil.Loc("InvalidCommandArg", arg));
+                        throw new Exception(StringUtil.Loc("InvalidCommandArg", arg));
                     }
 
                     // Add the arg.
@@ -568,8 +569,8 @@ namespace Agent.Plugins.Repository
         private async Task RunCommandAsync(params string[] args)
         {
             // Validation.
-            PluginUtil.NotNull(args, nameof(args));
-            PluginUtil.NotNull(_context, nameof(_context));
+            ArgUtil.NotNull(args, nameof(args));
+            ArgUtil.NotNull(_context, nameof(_context));
 
             // Invoke tf.
             var processInvoker = new ProcessInvoker(_context);
@@ -603,8 +604,8 @@ namespace Agent.Plugins.Repository
         private async Task<string> RunPorcelainCommandAsync(params string[] args)
         {
             // Validation.
-            PluginUtil.NotNull(args, nameof(args));
-            PluginUtil.NotNull(_context, nameof(_context));
+            ArgUtil.NotNull(args, nameof(args));
+            ArgUtil.NotNull(_context, nameof(_context));
 
             // Invoke tf.
             var processInvoker = new ProcessInvoker(_context);
@@ -669,8 +670,8 @@ namespace Agent.Plugins.Repository
 
                 if (string.IsNullOrEmpty(serverPath))
                 {
-                    _context.Debug(PluginUtil.Loc("SvnEmptyServerPath", localPath));
-                    _context.Debug(PluginUtil.Loc("SvnMappingIgnored"));
+                    _context.Debug(StringUtil.Loc("SvnEmptyServerPath", localPath));
+                    _context.Debug(StringUtil.Loc("SvnMappingIgnored"));
 
                     distinctMappings.Clear();
                     distinctMappings.Add(string.Empty, map);
@@ -679,7 +680,7 @@ namespace Agent.Plugins.Repository
 
                 if (localPaths.Contains(localPath))
                 {
-                    _context.Debug(PluginUtil.Loc("SvnMappingDuplicateLocal", localPath));
+                    _context.Debug(StringUtil.Loc("SvnMappingDuplicateLocal", localPath));
                     continue;
                 }
                 else
@@ -689,7 +690,7 @@ namespace Agent.Plugins.Repository
 
                 if (distinctMappings.ContainsKey(serverPath))
                 {
-                    _context.Debug(PluginUtil.Loc("SvnMappingDuplicateServer", serverPath));
+                    _context.Debug(StringUtil.Loc("SvnMappingDuplicateServer", serverPath));
                     continue;
                 }
 
@@ -717,7 +718,7 @@ namespace Agent.Plugins.Repository
 
             if (relativePath.Contains(":") || relativePath.Contains(".."))
             {
-                throw new Exception(PluginUtil.Loc("SvnIncorrectRelativePath", relativePath));
+                throw new Exception(StringUtil.Loc("SvnIncorrectRelativePath", relativePath));
             }
 
             return relativePath;

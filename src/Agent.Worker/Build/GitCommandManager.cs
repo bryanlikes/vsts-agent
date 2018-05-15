@@ -143,7 +143,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.Build
             if (useBuiltInGit)
             {
 #if OS_WINDOWS
-                _gitPath = Path.Combine(IOUtil.GetExternalsPath(), "git", "cmd", $"git{IOUtil.ExeExtension}");
+                _gitPath = Path.Combine(HostContext.GetDirectory(WellKnownDirectory.Externals), "git", "cmd", $"git{IOUtil.ExeExtension}");
 
                 // Prepend the PATH.
                 context.Output(StringUtil.Loc("Prepending0WithDirectoryContaining1", Constants.PathVariable, Path.GetFileName(_gitPath)));
@@ -451,7 +451,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.Build
             context.Debug("Get git version.");
             Version version = null;
             List<string> outputStrings = new List<string>();
-            int exitCode = await ExecuteGitCommandAsync(context, IOUtil.GetWorkPath(HostContext), "version", null, outputStrings);
+            int exitCode = await ExecuteGitCommandAsync(context, HostContext.GetDirectory(WellKnownDirectory.Work), "version", null, outputStrings);
             context.Output($"{string.Join(Environment.NewLine, outputStrings)}");
             if (exitCode == 0)
             {
@@ -482,7 +482,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.Build
             context.Debug("Get git-lfs version.");
             Version version = null;
             List<string> outputStrings = new List<string>();
-            int exitCode = await ExecuteGitCommandAsync(context, IOUtil.GetWorkPath(HostContext), "lfs version", null, outputStrings);
+            int exitCode = await ExecuteGitCommandAsync(context, HostContext.GetDirectory(WellKnownDirectory.Work), "lfs version", null, outputStrings);
             context.Output($"{string.Join(Environment.NewLine, outputStrings)}");
             if (exitCode == 0)
             {

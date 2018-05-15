@@ -73,7 +73,7 @@ namespace Microsoft.VisualStudio.Services.Agent
         // This should only be called from config
         public void SaveCertificateSetting()
         {
-            string certSettingFile = IOUtil.GetAgentCertificateSettingFilePath();
+            string certSettingFile = HostContext.GetConfigFile(WellKnownConfigFile.certificates);
             IOUtil.DeleteFile(certSettingFile);
 
             var setting = new AgentCertificateSetting();
@@ -123,7 +123,7 @@ namespace Microsoft.VisualStudio.Services.Agent
         // This should only be called from unconfig
         public void DeleteCertificateSetting()
         {
-            string certSettingFile = IOUtil.GetAgentCertificateSettingFilePath();
+            string certSettingFile = HostContext.GetConfigFile(WellKnownConfigFile.certificates);
             if (File.Exists(certSettingFile))
             {
                 Trace.Info($"Load agent certificate setting from '{certSettingFile}'");
@@ -143,7 +143,7 @@ namespace Microsoft.VisualStudio.Services.Agent
 
         public void LoadCertificateSettings()
         {
-            string certSettingFile = IOUtil.GetAgentCertificateSettingFilePath();
+            string certSettingFile = HostContext.GetConfigFile(WellKnownConfigFile.certificates);
             if (File.Exists(certSettingFile))
             {
                 Trace.Info($"Load agent certificate setting from '{certSettingFile}'");

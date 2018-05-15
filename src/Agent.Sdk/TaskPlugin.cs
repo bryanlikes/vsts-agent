@@ -193,7 +193,7 @@ namespace Agent.Sdk
 
         public AgentCertificateSettings GetCertConfiguration()
         {
-            bool skipCertValidation = PluginUtil.ConvertToBoolean(this.Variables.GetValueOrDefault("Agent.SkipCertValidation")?.Value);
+            bool skipCertValidation = StringUtil.ConvertToBoolean(this.Variables.GetValueOrDefault("Agent.SkipCertValidation")?.Value);
             string caFile = this.Variables.GetValueOrDefault("Agent.CAInfo")?.Value;
             string clientCertFile = this.Variables.GetValueOrDefault("Agent.ClientCert")?.Value;
 
@@ -232,7 +232,7 @@ namespace Agent.Sdk
             {
                 string proxyUsername = this.Variables.GetValueOrDefault("Agent.ProxyUsername")?.Value;
                 string proxyPassword = this.Variables.GetValueOrDefault("Agent.ProxyPassword")?.Value;
-                List<string> proxyBypassHosts = PluginUtil.ConvertFromJson<List<string>>(this.Variables.GetValueOrDefault("Agent.ProxyBypassList")?.Value ?? "[]");
+                List<string> proxyBypassHosts = StringUtil.ConvertFromJson<List<string>>(this.Variables.GetValueOrDefault("Agent.ProxyBypassList")?.Value ?? "[]");
                 return new AgentWebProxySettings()
                 {
                     ProxyAddress = proxyUrl,

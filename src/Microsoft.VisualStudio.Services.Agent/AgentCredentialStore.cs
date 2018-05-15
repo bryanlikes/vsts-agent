@@ -57,7 +57,7 @@ namespace Microsoft.VisualStudio.Services.Agent
         {
             base.Initialize(hostContext);
 
-            _credStoreFile = IOUtil.GetAgentCredStoreFilePath();
+            _credStoreFile = hostContext.GetConfigFile(WellKnownConfigFile.credential_store);
             if (File.Exists(_credStoreFile))
             {
                 _credStore = IOUtil.LoadObject<Dictionary<string, string>>(_credStoreFile);

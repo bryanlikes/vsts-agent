@@ -24,22 +24,22 @@ namespace Microsoft.VisualStudio.Services.Agent.Util
             }
         }
 
-        public static StringComparison FilePathStringComparison
-        {
-            get
-            {
-                switch (Constants.Agent.Platform)
-                {
-                    case Constants.OSPlatform.Linux:
-                        return StringComparison.Ordinal;
-                    case Constants.OSPlatform.OSX:
-                    case Constants.OSPlatform.Windows:
-                        return StringComparison.OrdinalIgnoreCase;
-                    default:
-                        throw new NotSupportedException(); // Should never reach here.
-                }
-            }
-        }
+        // public static StringComparison FilePathStringComparison
+        // {
+        //     get
+        //     {
+        //         switch (Constants.Agent.Platform)
+        //         {
+        //             case Constants.OSPlatform.Linux:
+        //                 return StringComparison.Ordinal;
+        //             case Constants.OSPlatform.OSX:
+        //             case Constants.OSPlatform.Windows:
+        //                 return StringComparison.OrdinalIgnoreCase;
+        //             default:
+        //                 throw new NotSupportedException(); // Should never reach here.
+        //         }
+        //     }
+        // }
 
         public static void SaveObject(object obj, string path)
         {
