@@ -25,6 +25,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Pipelines = Microsoft.TeamFoundation.DistributedTask.Pipelines;
 using Microsoft.Win32;
+using Microsoft.VisualStudio.Services.Agent.Util;
 
 namespace Agent.Sdk
 {
@@ -73,7 +74,7 @@ namespace Agent.Sdk
         #region NetFrameworkUtil
         public static bool TestNetFrameworkVersion(AgentTaskPluginExecutionContext executionContext, Version minVersion)
         {
-            PluginUtil.NotNull(minVersion, nameof(minVersion));
+            ArgUtil.NotNull(minVersion, nameof(minVersion));
             InitVersions(executionContext);
             executionContext.Debug($"Testing for min NET Framework version: '{minVersion}'");
             return _versions.Any(x => x >= minVersion);
@@ -453,79 +454,10 @@ namespace Agent.Sdk
         }
         #endregion
 
-        #region ArgUtil
-        public static void DirectoryExists(string directory, string name)
-        {
-            PluginUtil.NotNullOrEmpty(directory, name);
-            if (!Directory.Exists(directory))
-            {
-                throw new DirectoryNotFoundException(directory);
-            }
-        }
-
-        public static void Equal<T>(T expected, T actual, string name)
-        {
-            if (object.ReferenceEquals(expected, actual))
-            {
-                return;
-            }
-
-            if (object.ReferenceEquals(expected, null) ||
-                !expected.Equals(actual))
-            {
-                throw new ArgumentOutOfRangeException(
-                    paramName: name,
-                    actualValue: actual,
-                    message: $"{name} does not equal expected value. Expected '{expected}'. Actual '{actual}'.");
-            }
-        }
-
-        public static void FileExists(string fileName, string name)
-        {
-            PluginUtil.NotNullOrEmpty(fileName, name);
-            if (!File.Exists(fileName))
-            {
-                throw new FileNotFoundException(fileName);
-            }
-        }
-
-        public static void NotNull(object value, string name)
-        {
-            if (object.ReferenceEquals(value, null))
-            {
-                throw new ArgumentNullException(name);
-            }
-        }
-
-        public static void NotNullOrEmpty(string value, string name)
-        {
-            if (string.IsNullOrEmpty(value))
-            {
-                throw new ArgumentNullException(name);
-            }
-        }
-
-        public static void NotEmpty(Guid value, string name)
-        {
-            if (value == Guid.Empty)
-            {
-                throw new ArgumentNullException(name);
-            }
-        }
-
-        public static void Null(object value, string name)
-        {
-            if (!object.ReferenceEquals(value, null))
-            {
-                throw new ArgumentException(message: $"{name} should be null.", paramName: name);
-            }
-        }
-        #endregion
-
         #region UrlUtil
         public static Uri GetCredentialEmbeddedUrl(Uri baseUrl, string username, string password)
         {
-            PluginUtil.NotNull(baseUrl, nameof(baseUrl));
+            ArgUtil.NotNull(baseUrl, nameof(baseUrl));
 
             // return baseurl when there is no username and password
             if (string.IsNullOrEmpty(username) && string.IsNullOrEmpty(password))
@@ -592,9 +524,9 @@ namespace Agent.Sdk
 
         public static VssCredentials GetVssCredential(ServiceEndpoint serviceEndpoint)
         {
-            NotNull(serviceEndpoint, nameof(serviceEndpoint));
-            NotNull(serviceEndpoint.Authorization, nameof(serviceEndpoint.Authorization));
-            NotNullOrEmpty(serviceEndpoint.Authorization.Scheme, nameof(serviceEndpoint.Authorization.Scheme));
+            ArgUtil.NotNull(serviceEndpoint, nameof(serviceEndpoint));
+            ArgUtil.NotNull(serviceEndpoint.Authorization, nameof(serviceEndpoint.Authorization));
+            ArgUtil.NotNullOrEmpty(serviceEndpoint.Authorization.Scheme, nameof(serviceEndpoint.Authorization.Scheme));
 
             if (serviceEndpoint.Authorization.Parameters.Count == 0)
             {
@@ -638,7 +570,7 @@ namespace Agent.Sdk
 
         public static void DeleteDirectory(string path, bool contentsOnly, bool continueOnContentDeleteError, CancellationToken cancellationToken)
         {
-            PluginUtil.NotNullOrEmpty(path, nameof(path));
+            ArgUtil.NotNullOrEmpty(path, nameof(path));
             DirectoryInfo directory = new DirectoryInfo(path);
             if (!directory.Exists)
             {
@@ -697,7 +629,7 @@ namespace Agent.Sdk
                                 {
                                     // Check if the item is a directory reparse point.
                                     var subdirectory = item as DirectoryInfo;
-                                    PluginUtil.NotNull(subdirectory, nameof(subdirectory));
+                                    ArgUtil.NotNull(subdirectory, nameof(subdirectory));
                                     if (subdirectory.Attributes.HasFlag(FileAttributes.ReparsePoint))
                                     {
                                         try
@@ -756,7 +688,7 @@ namespace Agent.Sdk
 
         public static void DeleteFile(string path)
         {
-            PluginUtil.NotNullOrEmpty(path, nameof(path));
+            ArgUtil.NotNullOrEmpty(path, nameof(path));
             var file = new FileInfo(path);
             if (file.Exists)
             {
@@ -770,8 +702,8 @@ namespace Agent.Sdk
         /// </summary>
         private static IEnumerable<FileSystemInfo> Enumerate(DirectoryInfo directory, CancellationTokenSource tokenSource)
         {
-            PluginUtil.NotNull(directory, nameof(directory));
-            PluginUtil.Equal(false, directory.Attributes.HasFlag(FileAttributes.ReparsePoint), nameof(directory.Attributes.HasFlag));
+            ArgUtil.NotNull(directory, nameof(directory));
+            ArgUtil.Equal(false, directory.Attributes.HasFlag(FileAttributes.ReparsePoint), nameof(directory.Attributes.HasFlag));
 
             // Push the directory onto the processing stack.
             var directories = new Stack<DirectoryInfo>(new[] { directory });
@@ -798,7 +730,7 @@ namespace Agent.Sdk
 
         private static void RemoveReadOnly(FileSystemInfo item)
         {
-            PluginUtil.NotNull(item, nameof(item));
+            ArgUtil.NotNull(item, nameof(item));
             if (item.Attributes.HasFlag(FileAttributes.ReadOnly))
             {
                 item.Attributes = item.Attributes & ~FileAttributes.ReadOnly;
@@ -809,7 +741,7 @@ namespace Agent.Sdk
         #region VarUtil
         public static string PrependPath(string path, string currentPath)
         {
-            PluginUtil.NotNullOrEmpty(path, nameof(path));
+            ArgUtil.NotNullOrEmpty(path, nameof(path));
             if (string.IsNullOrEmpty(currentPath))
             {
                 // Careful not to add a trailing separator if the PATH is empty.
@@ -823,7 +755,7 @@ namespace Agent.Sdk
 
         public static void PrependPath(string directory)
         {
-            PluginUtil.DirectoryExists(directory, nameof(directory));
+            ArgUtil.Directory(directory, nameof(directory));
 
             // Build the new value.
             string currentPath = Environment.GetEnvironmentVariable("PATH");
@@ -837,7 +769,7 @@ namespace Agent.Sdk
         #region WhichUtil
         public static string Which(string command, bool require = false)
         {
-            PluginUtil.NotNullOrEmpty(command, nameof(command));
+            ArgUtil.NotNullOrEmpty(command, nameof(command));
 
 #if OS_WINDOWS
             string path = Environment.GetEnvironmentVariable("Path");
@@ -995,8 +927,8 @@ namespace Agent.Sdk
             Encoding outputEncoding,
             CancellationToken cancellationToken)
         {
-            PluginUtil.Null(_proc, nameof(_proc));
-            PluginUtil.NotNullOrEmpty(fileName, nameof(fileName));
+            ArgUtil.Null(_proc, nameof(_proc));
+            ArgUtil.NotNullOrEmpty(fileName, nameof(fileName));
 
             executionContext.Debug("Starting process:");
             executionContext.Debug($"  File name: '{fileName}'");
@@ -1181,7 +1113,7 @@ namespace Agent.Sdk
 
         private async Task CancelAndKillProcessTree()
         {
-            PluginUtil.NotNull(_proc, nameof(_proc));
+            ArgUtil.NotNull(_proc, nameof(_proc));
             bool sigint_succeed = await SendSIGINT(_sigintTimeout);
             if (sigint_succeed)
             {

@@ -138,7 +138,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener
         /// <returns></returns>
         private async Task DownloadLatestAgent(CancellationToken token)
         {
-            string latestAgentDirectory = IOUtil.GetUpdatePath(HostContext);
+            string latestAgentDirectory = Path.Combine(HostContext.GetDirectory(WellKnownDirectory.Work), Constants.Path.UpdateDirectory);
             IOUtil.DeleteDirectory(latestAgentDirectory, token);
             Directory.CreateDirectory(latestAgentDirectory);
 

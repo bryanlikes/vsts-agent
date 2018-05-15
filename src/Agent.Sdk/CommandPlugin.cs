@@ -18,6 +18,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.TeamFoundation.DistributedTask.WebApi;
+using Microsoft.VisualStudio.Services.Agent.Util;
 using Microsoft.VisualStudio.Services.Common;
 using Microsoft.VisualStudio.Services.OAuth;
 using Microsoft.VisualStudio.Services.WebApi;
@@ -134,11 +135,11 @@ namespace Agent.Sdk
             }
 
             ServiceEndpoint systemConnection = this.Endpoints.FirstOrDefault(e => string.Equals(e.Name, WellKnownServiceEndpointNames.SystemVssConnection, StringComparison.OrdinalIgnoreCase));
-            PluginUtil.NotNull(systemConnection, nameof(systemConnection));
-            PluginUtil.NotNull(systemConnection.Url, nameof(systemConnection.Url));
+            ArgUtil.NotNull(systemConnection, nameof(systemConnection));
+            ArgUtil.NotNull(systemConnection.Url, nameof(systemConnection.Url));
 
             VssCredentials credentials = PluginUtil.GetVssCredential(systemConnection);
-            PluginUtil.NotNull(credentials, nameof(credentials));
+            ArgUtil.NotNull(credentials, nameof(credentials));
             return PluginUtil.CreateConnection(systemConnection.Url, credentials);
         }
 

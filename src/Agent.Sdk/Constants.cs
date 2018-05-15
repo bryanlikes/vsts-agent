@@ -2,45 +2,6 @@ using System;
 
 namespace Microsoft.VisualStudio.Services.Agent
 {
-    public enum RunMode
-    {
-        Normal, // Keep "Normal" first (default value).
-        Local,
-    }
-
-    public enum WellKnownDirectory
-    {
-        Bin,
-        Diag,
-        Externals,
-        LegacyPSHost,
-        Root,
-        ServerOM,
-        Tee,
-        Tasks,
-        Update,
-        Work,
-    }
-
-    public enum WellKnownConfigFile
-    {
-        agent,
-        credentials,
-        credentials_rsaparams,
-        service,
-#if OS_OSX
-        credential_store.keychain,
-#else
-        credential_store,
-#endif
-        certificates,
-        proxy,
-        proxycredentials,
-        proxybypass,
-        autologon,
-        options,
-    }
-
     public static class Constants
     {
         /// <summary>Path environment varible name.</summary>

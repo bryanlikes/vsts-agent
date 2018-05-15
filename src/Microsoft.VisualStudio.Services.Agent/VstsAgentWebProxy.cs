@@ -62,13 +62,13 @@ namespace Microsoft.VisualStudio.Services.Agent
         {
             if (!string.IsNullOrEmpty(ProxyAddress))
             {
-                string proxyConfigFile = IOUtil.GetProxyConfigFilePath();
+                string proxyConfigFile = HostContext.GetConfigFile(WellKnownConfigFile.proxy);
                 IOUtil.DeleteFile(proxyConfigFile);
                 Trace.Info($"Store proxy configuration to '{proxyConfigFile}' for proxy '{ProxyAddress}'");
                 File.WriteAllText(proxyConfigFile, ProxyAddress);
                 File.SetAttributes(proxyConfigFile, File.GetAttributes(proxyConfigFile) | FileAttributes.Hidden);
 
-                string proxyCredFile = IOUtil.GetProxyCredentialsFilePath();
+                string proxyCredFile = HostContext.GetConfigFile(WellKnownConfigFile.proxycredentials);
                 IOUtil.DeleteFile(proxyCredFile);
                 if (!string.IsNullOrEmpty(ProxyUsername) && !string.IsNullOrEmpty(ProxyPassword))
                 {
@@ -90,7 +90,7 @@ namespace Microsoft.VisualStudio.Services.Agent
         // This should only be called from unconfig
         public void DeleteProxySetting()
         {
-            string proxyCredFile = IOUtil.GetProxyCredentialsFilePath();
+            string proxyCredFile = HostContext.GetConfigFile(WellKnownConfigFile.proxycredentials);
             if (File.Exists(proxyCredFile))
             {
                 Trace.Info("Delete proxy credential from credential store.");
@@ -105,21 +105,21 @@ namespace Microsoft.VisualStudio.Services.Agent
                 IOUtil.DeleteFile(proxyCredFile);
             }
 
-            string proxyBypassFile = IOUtil.GetProxyBypassFilePath();
+            string proxyBypassFile = HostContext.GetConfigFile(WellKnownConfigFile.proxybypass);
             if (File.Exists(proxyBypassFile))
             {
                 Trace.Info($"Delete .proxybypass file: {proxyBypassFile}");
                 IOUtil.DeleteFile(proxyBypassFile);
             }
 
-            string proxyConfigFile = IOUtil.GetProxyConfigFilePath();
+            string proxyConfigFile = HostContext.GetConfigFile(WellKnownConfigFile.proxy);
             Trace.Info($"Delete .proxy file: {proxyConfigFile}");
             IOUtil.DeleteFile(proxyConfigFile);
         }
 
         private void LoadProxySetting()
         {
-            string proxyConfigFile = IOUtil.GetProxyConfigFilePath();
+            string proxyConfigFile = HostContext.GetConfigFile(WellKnownConfigFile.proxy);
             if (File.Exists(proxyConfigFile))
             {
                 // we expect the first line of the file is the proxy url
@@ -147,7 +147,7 @@ namespace Microsoft.VisualStudio.Services.Agent
             {
                 Trace.Info($"Config proxy at: {ProxyAddress}.");
 
-                string proxyCredFile = IOUtil.GetProxyCredentialsFilePath();
+                string proxyCredFile = HostContext.GetConfigFile(WellKnownConfigFile.proxycredentials);
                 if (File.Exists(proxyCredFile))
                 {
                     string lookupKey = File.ReadAllLines(proxyCredFile).FirstOrDefault();
@@ -184,7 +184,7 @@ namespace Microsoft.VisualStudio.Services.Agent
                     Trace.Info($"Config authentication proxy as: {ProxyUsername}.");
                 }
 
-                string proxyBypassFile = IOUtil.GetProxyBypassFilePath();
+                string proxyBypassFile = HostContext.GetConfigFile(WellKnownConfigFile.proxybypass);
                 if (File.Exists(proxyBypassFile))
                 {
                     Trace.Verbose($"Try read proxy bypass list from file: {proxyBypassFile}.");
