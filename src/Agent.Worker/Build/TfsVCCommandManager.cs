@@ -105,7 +105,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.Build
             ArgUtil.NotNull(ExecutionContext, nameof(ExecutionContext));
 
             // Invoke tf.
-            using (var processInvoker = HostContext.CreateService<IProcessInvoker>())
+            using (var processInvoker = HostContext.CreateProcessInvoker())
             {
                 var outputLock = new object();
                 processInvoker.OutputDataReceived += (object sender, ProcessDataReceivedEventArgs e) =>
@@ -164,7 +164,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.Build
             ArgUtil.NotNull(ExecutionContext, nameof(ExecutionContext));
 
             // Invoke tf.
-            using (var processInvoker = HostContext.CreateService<IProcessInvoker>())
+            using (var processInvoker = HostContext.CreateProcessInvoker())
             {
                 var result = new TfsVCPorcelainCommandResult();
                 var outputLock = new object();

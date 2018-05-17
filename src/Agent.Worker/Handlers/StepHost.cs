@@ -59,7 +59,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.Handlers
                                             bool killProcessOnCancel,
                                             CancellationToken cancellationToken)
         {
-            using (var processInvoker = HostContext.CreateService<IProcessInvoker>())
+            using (var processInvoker = HostContext.CreateProcessInvoker())
             {
                 processInvoker.OutputDataReceived += OutputDataReceived;
                 processInvoker.ErrorDataReceived += ErrorDataReceived;
@@ -161,7 +161,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.Handlers
             string containerExecutionArgs = $"exec -i {Container.ContainerId} {node} {entryScript}";
 #endif
 
-            using (var processInvoker = HostContext.CreateService<IProcessInvoker>())
+            using (var processInvoker = HostContext.CreateProcessInvoker())
             {
                 processInvoker.OutputDataReceived += OutputDataReceived;
                 processInvoker.ErrorDataReceived += ErrorDataReceived;

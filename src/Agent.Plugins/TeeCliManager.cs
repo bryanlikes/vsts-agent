@@ -77,7 +77,7 @@ namespace Agent.Plugins.Repository
         public void SetupClientCertificate(string clientCert, string clientCertKey, string clientCertArchive, string clientCertPassword)
         {
             ExecutionContext.Debug("Convert client certificate from 'pkcs' format to 'jks' format.");
-            string toolPath = PluginUtil.Which("keytool", true);
+            string toolPath = WhichUtil.Which("keytool", true, ExecutionContext);
             string jksFile = Path.Combine(ExecutionContext.Variables.GetValueOrDefault("agent.tempdirectory")?.Value, $"{Guid.NewGuid()}.jks");
             string argLine;
             if (!string.IsNullOrEmpty(clientCertPassword))

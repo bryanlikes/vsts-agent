@@ -454,7 +454,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener.Configuration
             try
             {
                 //invoke the service with special argument, that tells it to register an event log trace source (need to run as an admin)
-                using (var processInvoker = HostContext.CreateService<IProcessInvoker>())
+                using (var processInvoker = HostContext.CreateProcessInvoker())
                 {
                     processInvoker.OutputDataReceived += delegate (object sender, ProcessDataReceivedEventArgs message)
                     {

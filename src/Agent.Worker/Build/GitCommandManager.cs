@@ -137,8 +137,6 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.Build
 
         public async Task LoadGitExecutionInfo(IExecutionContext context, bool useBuiltInGit)
         {
-            var whichUtil = HostContext.GetService<IWhichUtil>();
-
             // Resolve the location of git.
             if (useBuiltInGit)
             {
@@ -147,8 +145,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.Build
 
                 // Prepend the PATH.
                 context.Output(StringUtil.Loc("Prepending0WithDirectoryContaining1", Constants.PathVariable, Path.GetFileName(_gitPath)));
-                var varUtil = HostContext.GetService<IVarUtil>();
-                varUtil.PrependPath(Path.GetDirectoryName(_gitPath));
+                PathUtil.PrependPath(Path.GetDirectoryName(_gitPath));
                 context.Debug($"{Constants.PathVariable}: '{Environment.GetEnvironmentVariable(Constants.PathVariable)}'");
 #else
                 // There is no built-in git for OSX/Linux
@@ -157,7 +154,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.Build
             }
             else
             {
-                _gitPath = whichUtil.Which("git", require: true);
+                _gitPath = WhichUtil.Which("git", require: true, trace: Trace);
             }
 
             ArgUtil.File(_gitPath, nameof(_gitPath));
@@ -170,7 +167,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.Build
             // Resolve the location of git-lfs.
             // This should be best effort since checkout lfs objects is an option.
             // We will check and ensure git-lfs version later
-            _gitLfsPath = whichUtil.Which("git-lfs", require: false);
+            _gitLfsPath = WhichUtil.Which("git-lfs", require: false, trace: Trace);
 
             // Get the Git-LFS version if git-lfs exist in %PATH%.
             if (!string.IsNullOrEmpty(_gitLfsPath))
@@ -511,7 +508,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.Build
             string arg = StringUtil.Format($"{command} {options}").Trim();
             context.Command($"git {arg}");
 
-            var processInvoker = HostContext.CreateService<IProcessInvoker>();
+            var processInvoker = HostContext.CreateProcessInvoker();
             processInvoker.OutputDataReceived += delegate (object sender, ProcessDataReceivedEventArgs message)
             {
                 context.Output(message.Data);
@@ -543,7 +540,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.Build
             }
 
             object outputLock = new object();
-            var processInvoker = HostContext.CreateService<IProcessInvoker>();
+            var processInvoker = HostContext.CreateProcessInvoker();
             processInvoker.OutputDataReceived += delegate (object sender, ProcessDataReceivedEventArgs message)
             {
                 lock (outputLock)
@@ -575,7 +572,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.Build
             string arg = StringUtil.Format($"{additionalCommandLine} {command} {options}").Trim();
             context.Command($"git {arg}");
 
-            var processInvoker = HostContext.CreateService<IProcessInvoker>();
+            var processInvoker = HostContext.CreateProcessInvoker();
             processInvoker.OutputDataReceived += delegate (object sender, ProcessDataReceivedEventArgs message)
             {
                 context.Output(message.Data);

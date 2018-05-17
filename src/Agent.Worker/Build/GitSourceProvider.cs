@@ -420,7 +420,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.Build
                         string argLine = $"775 {_clientCertPrivateKeyAskPassFile}";
                         executionContext.Command($"chmod {argLine}");
 
-                        var processInvoker = HostContext.CreateService<IProcessInvoker>();
+                        var processInvoker = HostContext.CreateProcessInvoker();
                         processInvoker.OutputDataReceived += (object sender, ProcessDataReceivedEventArgs args) =>
                         {
                             if (!string.IsNullOrEmpty(args.Data))

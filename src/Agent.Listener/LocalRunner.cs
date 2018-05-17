@@ -531,7 +531,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener
 
             // Run git and return the output from the streams.
             var output = new StringBuilder();
-            var processInvoker = HostContext.CreateService<IProcessInvoker>();
+            var processInvoker = HostContext.CreateProcessInvoker();
             Console.WriteLine();
             Console.WriteLine($"git {arguments}");
             processInvoker.OutputDataReceived += delegate (object sender, ProcessDataReceivedEventArgs message)

@@ -13,6 +13,7 @@ using System.Diagnostics;
 using System.Net.Http;
 using System.Diagnostics.Tracing;
 using Microsoft.TeamFoundation.DistributedTask.Logging;
+using Agent.Sdk;
 
 namespace Microsoft.VisualStudio.Services.Agent
 {
@@ -32,6 +33,7 @@ namespace Microsoft.VisualStudio.Services.Agent
         void SetDefaultCulture(string name);
         event EventHandler Unloading;
         void ShutdownAgent(ShutdownReason reason);
+        ProcessInvoker CreateProcessInvoker();
     }
 
     public enum StartupType
@@ -94,7 +96,8 @@ namespace Microsoft.VisualStudio.Services.Agent
                     logRetentionDays = _defaultLogRetentionDays;
                 }
 
-                _traceManager = new TraceManager(new HostTraceListener(GetDirectory(WellKnownDirectory.Diag), hostType, logPageSize, logRetentionDays), this.SecretMasker);
+                string logDir = Path.Combine(new DirectoryInfo(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location)).Parent.FullName, Constants.Path.DiagDirectory);
+                _traceManager = new TraceManager(new HostTraceListener(logDir, hostType, logPageSize, logRetentionDays), this.SecretMasker);
             }
             else
             {
@@ -375,6 +378,11 @@ namespace Microsoft.VisualStudio.Services.Agent
             _trace.Info($"Agent will be shutdown for {reason.ToString()}");
             AgentShutdownReason = reason;
             _agentShutdownTokenSource.Cancel();
+        }
+
+        public ProcessInvoker CreateProcessInvoker()
+        {
+            return new ProcessInvoker(_trace);
         }
 
         public override void Dispose()

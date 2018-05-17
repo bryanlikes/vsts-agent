@@ -50,7 +50,7 @@ namespace Agent.Plugins.Repository
         {
             ArgUtil.File(AppConfigRestoreFile, "tf.exe.config.restore");
             ExecutionContext.Debug("Restore default tf.exe.config.");
-            PluginUtil.DeleteFile(AppConfigFile);
+            IOUtil.DeleteFile(AppConfigFile);
             File.Copy(AppConfigRestoreFile, AppConfigFile);
         }
 

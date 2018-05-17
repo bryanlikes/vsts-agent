@@ -96,8 +96,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.Build
             _cancellationToken = cancellationToken;
 
             // Find svn in %Path%
-            IWhichUtil whichTool = HostContext.GetService<IWhichUtil>();
-            string svnPath = whichTool.Which("svn");
+            string svnPath = WhichUtil.Which("svn", trace: Trace);
 
             if (string.IsNullOrEmpty(svnPath))
             {
@@ -611,7 +610,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.Build
             ArgUtil.NotNull(_context, nameof(_context));
 
             // Invoke tf.
-            using (var processInvoker = HostContext.CreateService<IProcessInvoker>())
+            using (var processInvoker = HostContext.CreateProcessInvoker())
             {
                 var outputLock = new object();
                 processInvoker.OutputDataReceived += (object sender, ProcessDataReceivedEventArgs e) =>
@@ -647,7 +646,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.Build
             ArgUtil.NotNull(_context, nameof(_context));
 
             // Invoke tf.
-            using (var processInvoker = HostContext.CreateService<IProcessInvoker>())
+            using (var processInvoker = HostContext.CreateProcessInvoker())
             {
                 var output = new List<string>();
                 var outputLock = new object();

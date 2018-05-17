@@ -76,12 +76,11 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener
 
             // kick off update script
             Process invokeScript = new Process();
-            var whichUtil = HostContext.GetService<IWhichUtil>();
 #if OS_WINDOWS
-            invokeScript.StartInfo.FileName = whichUtil.Which("cmd.exe");
+            invokeScript.StartInfo.FileName = WhichUtil.Which("cmd.exe", trace: Trace);
             invokeScript.StartInfo.Arguments = $"/c \"{updateScript}\"";
 #elif (OS_OSX || OS_LINUX)
-            invokeScript.StartInfo.FileName = whichUtil.Which("bash");
+            invokeScript.StartInfo.FileName = WhichUtil.Which("bash", trace: Trace);
             invokeScript.StartInfo.Arguments = $"\"{updateScript}\"";
 #endif
             invokeScript.Start();
@@ -175,15 +174,14 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener
                 }
                 else if (archiveFile.EndsWith(".tar.gz", StringComparison.OrdinalIgnoreCase))
                 {
-                    var whichUtil = HostContext.GetService<IWhichUtil>();
-                    string tar = whichUtil.Which("tar");
+                    string tar = WhichUtil.Which("tar", trace: Trace);
                     if (string.IsNullOrEmpty(tar))
                     {
                         throw new NotSupportedException($"tar -xzf");
                     }
 
                     // tar -xzf
-                    using (var processInvoker = HostContext.CreateService<IProcessInvoker>())
+                    using (var processInvoker = HostContext.CreateProcessInvoker())
                     {
                         processInvoker.OutputDataReceived += new EventHandler<ProcessDataReceivedEventArgs>((sender, args) =>
                         {

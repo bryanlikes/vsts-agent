@@ -20,8 +20,8 @@ namespace Microsoft.VisualStudio.Services.Agent.Tests.Util
                 Tracing trace = hc.GetTrace();
 
                 // Act.
-                ApiUtil.InitializeVssClientSettings(null, new AgentCertificateManager());
-                var connect = ApiUtil.CreateConnection(new Uri("https://github.com/Microsoft/vsts-agent"), new VssCredentials());
+                PlanUtil.InitializeVssClientSettings(null, new AgentCertificateManager());
+                var connect = PlanUtil.CreateConnection(new Uri("https://github.com/Microsoft/vsts-agent"), new VssCredentials());
 
                 // Trace
                 foreach (var ua in connect.Settings.UserAgent ?? new List<ProductInfoHeaderValue>())
@@ -55,8 +55,8 @@ namespace Microsoft.VisualStudio.Services.Agent.Tests.Util
                 Tracing trace = hc.GetTrace();
 
                 // Act.
-                ApiUtil.InitializeVssClientSettings(null, new AgentCertificateManager());
-                var connect = ApiUtil.CreateConnection(new Uri("https://github.com/Microsoft/vsts-agent"), new VssCredentials());
+                PlanUtil.InitializeVssClientSettings(null, new AgentCertificateManager());
+                var connect = PlanUtil.CreateConnection(new Uri("https://github.com/Microsoft/vsts-agent"), new VssCredentials());
 
                 string platformInfo = null;
                 // Trace
@@ -112,7 +112,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Tests.Util
                     trace.Info("Set httptimeout to 360.");
                     Environment.SetEnvironmentVariable("VSTS_HTTP_TIMEOUT", "360");
 
-                    var connect = ApiUtil.CreateConnection(new Uri("https://github.com/Microsoft/vsts-agent"), new VssCredentials());
+                    var connect = PlanUtil.CreateConnection(new Uri("https://github.com/Microsoft/vsts-agent"), new VssCredentials());
 
                     // Assert.
                     Assert.Equal(connect.Settings.MaxRetryRequest.ToString(), "10");
@@ -123,7 +123,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Tests.Util
                     trace.Info("Set httptimeout to 3600.");
                     Environment.SetEnvironmentVariable("VSTS_HTTP_TIMEOUT", "3600");
 
-                    connect = ApiUtil.CreateConnection(new Uri("https://github.com/Microsoft/vsts-agent"), new VssCredentials());
+                    connect = PlanUtil.CreateConnection(new Uri("https://github.com/Microsoft/vsts-agent"), new VssCredentials());
 
                     // Assert.
                     Assert.Equal(connect.Settings.MaxRetryRequest.ToString(), "10");

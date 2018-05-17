@@ -300,7 +300,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
 
             List<string> outputs = new List<string>();
             object outputLock = new object();
-            var processInvoker = HostContext.CreateService<IProcessInvoker>();
+            var processInvoker = HostContext.CreateProcessInvoker();
             processInvoker.OutputDataReceived += delegate (object sender, ProcessDataReceivedEventArgs message)
             {
                 if (!string.IsNullOrEmpty(message.Data))

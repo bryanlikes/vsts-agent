@@ -36,7 +36,7 @@ namespace Agent.Sdk
         Task RunAsync(AgentTaskPluginExecutionContext executionContext, CancellationToken token);
     }
 
-    public class AgentTaskPluginExecutionContext
+    public class AgentTaskPluginExecutionContext : ITraceWriter
     {
         private VssConnection _connection;
         private readonly object _stdoutLock = new object();
@@ -109,9 +109,9 @@ namespace Agent.Sdk
             ArgUtil.NotNull(systemConnection, nameof(systemConnection));
             ArgUtil.NotNull(systemConnection.Url, nameof(systemConnection.Url));
 
-            VssCredentials credentials = PluginUtil.GetVssCredential(systemConnection);
+            VssCredentials credentials = VssUtil.GetVssCredential(systemConnection);
             ArgUtil.NotNull(credentials, nameof(credentials));
-            return PluginUtil.CreateConnection(systemConnection.Url, credentials);
+            return VssUtil.CreateConnection(systemConnection.Url, credentials);
         }
         public string GetInput(string name, bool required = false)
         {
@@ -127,6 +127,24 @@ namespace Agent.Sdk
             }
 
             return value;
+        }
+
+        public void Info(string message)
+        {
+            Debug(message);
+        }
+
+        public void Verbose(string message)
+        {
+#if DEBUG
+            Debug(message);
+#else
+            string vstsAgentTrace = Environment.GetEnvironmentVariable("VSTSAGENT_TRACE");
+            if (!string.IsNullOrEmpty(vstsAgentTrace))
+            {
+                Debug(message);
+            }
+#endif
         }
 
         public void Error(string message)
@@ -155,7 +173,7 @@ namespace Agent.Sdk
 
         public void PrependPath(string directory)
         {
-            PluginUtil.PrependPath(directory);
+            PathUtil.PrependPath(directory);
             Output($"##vso[task.prependpath]{Escape(directory)}");
         }
 

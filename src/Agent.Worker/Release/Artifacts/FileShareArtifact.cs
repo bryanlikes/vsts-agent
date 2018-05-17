@@ -3,7 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-
+using Agent.Sdk;
 using Microsoft.VisualStudio.Services.Agent.Util;
 using Microsoft.VisualStudio.Services.Agent.Worker.Release.Artifacts.Definition;
 
@@ -95,7 +95,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.Release.Artifacts
             }
 
             executionContext.Output(StringUtil.Loc("RMDownloadingArtifactUsingRobocopy"));
-            using (var processInvoker = hostContext.CreateService<IProcessInvoker>())
+            using (var processInvoker = hostContext.CreateProcessInvoker())
             {
                 // Save STDOUT from worker, worker will use STDOUT report unhandle exception.
                 processInvoker.OutputDataReceived += delegate (object sender, ProcessDataReceivedEventArgs stdout)

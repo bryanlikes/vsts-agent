@@ -31,7 +31,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener.Configuration
                 if (!String.IsNullOrEmpty(chmodPath))
                 {
                     var arguments = $"600 {new FileInfo(_keyFile).FullName}";
-                    using (var invoker = _context.CreateService<IProcessInvoker>())
+                    using (var invoker = _context.CreateProcessInvoker())
                     {
                         var exitCode = invoker.ExecuteAsync(IOUtil.GetRootPath(), chmodPath, arguments, null, default(CancellationToken)).GetAwaiter().GetResult();
                         if (exitCode == 0)

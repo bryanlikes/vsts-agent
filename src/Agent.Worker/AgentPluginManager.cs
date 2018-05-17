@@ -189,7 +189,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
                 pluginContext.TaskVariables[publicVar.Key] = new VariableValue(publicVar.Value, true);
             }
 
-            using (var processInvoker = HostContext.CreateService<IProcessInvoker>())
+            using (var processInvoker = HostContext.CreateProcessInvoker())
             {
                 processInvoker.OutputDataReceived += outputHandler;
                 processInvoker.ErrorDataReceived += outputHandler;
@@ -262,7 +262,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
             // A non-zero exit code indicates infrastructural failure.
             // Any content coming from STDERR will indicate the command process failed.
             // We can't use ## command for plugin to communicate, since we are already processing ## command
-            using (var processInvoker = HostContext.CreateService<IProcessInvoker>())
+            using (var processInvoker = HostContext.CreateProcessInvoker())
             {
                 object stderrLock = new object();
                 List<string> stderr = new List<string>();

@@ -11,81 +11,8 @@ using System.Runtime.InteropServices;
 
 namespace Microsoft.VisualStudio.Services.Agent.Util
 {
-    public static class ApiUtil
+    public static class PlanUtil
     {
-        public static void InitializeVssClientSettings(IVstsAgentWebProxy proxySetting, IAgentCertificateManager certSetting)
-        {
-            var headerValues = new List<ProductInfoHeaderValue>();
-            headerValues.Add(new ProductInfoHeaderValue($"VstsAgentCore-{BuildConstants.AgentPackage.PackageName}", Constants.Agent.Version));
-            headerValues.Add(new ProductInfoHeaderValue($"({RuntimeInformation.OSDescription.Trim()})"));
-
-            if (VssClientHttpRequestSettings.Default.UserAgent != null && VssClientHttpRequestSettings.Default.UserAgent.Count > 0)
-            {
-                headerValues.AddRange(VssClientHttpRequestSettings.Default.UserAgent);
-            }
-
-            VssClientHttpRequestSettings.Default.UserAgent = headerValues;
-            VssClientHttpRequestSettings.Default.ClientCertificateManager = certSetting.VssClientCertificateManager;
-            VssHttpMessageHandler.DefaultWebProxy = proxySetting.WebProxy;
-        }
-
-        public static VssConnection CreateConnection(Uri serverUri, VssCredentials credentials, IEnumerable<DelegatingHandler> additionalDelegatingHandler = null)
-        {
-            VssClientHttpRequestSettings settings = VssClientHttpRequestSettings.Default.Clone();
-
-            int maxRetryRequest;
-            if (!int.TryParse(Environment.GetEnvironmentVariable("VSTS_HTTP_RETRY") ?? string.Empty, out maxRetryRequest))
-            {
-                maxRetryRequest = 5;
-            }
-
-            // make sure MaxRetryRequest in range [5, 10]
-            settings.MaxRetryRequest = Math.Min(Math.Max(maxRetryRequest, 5), 10);
-
-            int httpRequestTimeoutSeconds;
-            if (!int.TryParse(Environment.GetEnvironmentVariable("VSTS_HTTP_TIMEOUT") ?? string.Empty, out httpRequestTimeoutSeconds))
-            {
-                httpRequestTimeoutSeconds = 100;
-            }
-
-            // make sure httpRequestTimeoutSeconds in range [100, 1200]
-            settings.SendTimeout = TimeSpan.FromSeconds(Math.Min(Math.Max(httpRequestTimeoutSeconds, 100), 1200));
-
-            // Remove Invariant from the list of accepted languages.
-            //
-            // The constructor of VssHttpRequestSettings (base class of VssClientHttpRequestSettings) adds the current
-            // UI culture to the list of accepted languages. The UI culture will be Invariant on OSX/Linux when the
-            // LANG environment variable is not set when the program starts. If Invariant is in the list of accepted
-            // languages, then "System.ArgumentException: The value cannot be null or empty." will be thrown when the
-            // settings are applied to an HttpRequestMessage.
-            settings.AcceptLanguages.Remove(CultureInfo.InvariantCulture);
-
-            VssConnection connection = new VssConnection(serverUri, new VssHttpMessageHandler(credentials, settings), additionalDelegatingHandler);
-            return connection;
-        }
-
-        public static VssCredentials GetVssCredential(ServiceEndpoint serviceEndpoint)
-        {
-            ArgUtil.NotNull(serviceEndpoint, nameof(serviceEndpoint));
-            ArgUtil.NotNull(serviceEndpoint.Authorization, nameof(serviceEndpoint.Authorization));
-            ArgUtil.NotNullOrEmpty(serviceEndpoint.Authorization.Scheme, nameof(serviceEndpoint.Authorization.Scheme));
-
-            if (serviceEndpoint.Authorization.Parameters.Count == 0)
-            {
-                throw new ArgumentOutOfRangeException(nameof(serviceEndpoint));
-            }
-
-            VssCredentials credentials = null;
-            string accessToken;
-            if (serviceEndpoint.Authorization.Scheme == EndpointAuthorizationSchemes.OAuth &&
-                serviceEndpoint.Authorization.Parameters.TryGetValue(EndpointAuthorizationParameters.AccessToken, out accessToken))
-            {
-                credentials = new VssCredentials(null, new VssOAuthAccessTokenCredential(accessToken), CredentialPromptType.DoNotPrompt);
-            }
-
-            return credentials;
-        }
-
         public static PlanFeatures GetFeatures(TaskOrchestrationPlanReference plan)
         {
             ArgUtil.NotNull(plan, nameof(plan));

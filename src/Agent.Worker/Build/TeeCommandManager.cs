@@ -75,8 +75,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.Build
         public void SetupClientCertificate(string clientCert, string clientCertKey, string clientCertArchive, string clientCertPassword)
         {
             ExecutionContext.Debug("Convert client certificate from 'pkcs' format to 'jks' format.");
-            var whichUtil = HostContext.GetService<IWhichUtil>();
-            string toolPath = whichUtil.Which("keytool", true);
+            string toolPath = WhichUtil.Which("keytool", true, Trace);
             string jksFile = Path.Combine(ExecutionContext.Variables.Agent_TempDirectory, $"{Guid.NewGuid()}.jks");
             string argLine;
             if (!string.IsNullOrEmpty(clientCertPassword))
@@ -90,7 +89,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.Build
 
             ExecutionContext.Command($"{toolPath} {argLine}");
 
-            var processInvoker = HostContext.CreateService<IProcessInvoker>();
+            var processInvoker = HostContext.CreateProcessInvoker();
             processInvoker.OutputDataReceived += (object sender, ProcessDataReceivedEventArgs args) =>
             {
                 if (!string.IsNullOrEmpty(args.Data))

@@ -36,7 +36,7 @@ namespace Agent.Sdk
         Task ProcessCommandAsync(AgentCommandPluginExecutionContext executionContext, CancellationToken token);
     }
 
-    public class AgentCommandPluginExecutionContext
+    public class AgentCommandPluginExecutionContext : ITraceWriter
     {
         private VssConnection _connection;
         private readonly object _stdoutLock = new object();
@@ -72,6 +72,24 @@ namespace Agent.Sdk
                 }
                 return _connection;
             }
+        }
+
+        public void Info(string message)
+        {
+            Debug(message);
+        }
+
+        public void Verbose(string message)
+        {
+#if DEBUG
+            Debug(message);
+#else
+            string vstsAgentTrace = Environment.GetEnvironmentVariable("VSTSAGENT_TRACE");
+            if (!string.IsNullOrEmpty(vstsAgentTrace))
+            {
+                Debug(message);
+            }
+#endif
         }
 
         public void Debug(string message)
@@ -138,9 +156,9 @@ namespace Agent.Sdk
             ArgUtil.NotNull(systemConnection, nameof(systemConnection));
             ArgUtil.NotNull(systemConnection.Url, nameof(systemConnection.Url));
 
-            VssCredentials credentials = PluginUtil.GetVssCredential(systemConnection);
+            VssCredentials credentials = VssUtil.GetVssCredential(systemConnection);
             ArgUtil.NotNull(credentials, nameof(credentials));
-            return PluginUtil.CreateConnection(systemConnection.Url, credentials);
+            return VssUtil.CreateConnection(systemConnection.Url, credentials);
         }
 
         public string TranslateContainerPathToHostPath(string path)

@@ -30,8 +30,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.Build
 
 #if OS_WINDOWS
             // Validate .NET Framework 4.6 or higher is installed.
-            var netFrameworkUtil = HostContext.GetService<INetFrameworkUtil>();
-            if (!netFrameworkUtil.Test(new Version(4, 6)))
+            if (!NetFrameworkUtil.Test(new Version(4, 6), Trace))
             {
                 throw new Exception(StringUtil.Loc("MinimumNetFramework46"));
             }
@@ -73,9 +72,8 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.Build
             // Add TF to the PATH.
             string tfPath = tf.FilePath;
             ArgUtil.File(tfPath, nameof(tfPath));
-            var varUtil = HostContext.GetService<IVarUtil>();
             executionContext.Output(StringUtil.Loc("Prepending0WithDirectoryContaining1", Constants.PathVariable, Path.GetFileName(tfPath)));
-            varUtil.PrependPath(Path.GetDirectoryName(tfPath));
+            PathUtil.PrependPath(Path.GetDirectoryName(tfPath));
             executionContext.Debug($"{Constants.PathVariable}: '{Environment.GetEnvironmentVariable(Constants.PathVariable)}'");
 
 #if OS_WINDOWS

@@ -71,7 +71,7 @@ namespace Agent.Plugins.Repository
             }
             else
             {
-                gitPath = PluginUtil.Which("git", require: true);
+                gitPath = WhichUtil.Which("git", require: true, trace: context);
             }
 
             ArgUtil.File(gitPath, nameof(gitPath));
@@ -84,7 +84,7 @@ namespace Agent.Plugins.Repository
             // Resolve the location of git-lfs.
             // This should be best effort since checkout lfs objects is an option.
             // We will check and ensure git-lfs version later
-            gitLfsPath = PluginUtil.Which("git-lfs", require: false);
+            gitLfsPath = WhichUtil.Which("git-lfs", require: false, trace: context);
 
             // Get the Git-LFS version if git-lfs exist in %PATH%.
             if (!string.IsNullOrEmpty(gitLfsPath))

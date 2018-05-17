@@ -30,7 +30,7 @@ namespace Agent.Plugins.Repository
 
 #if OS_WINDOWS
             // Validate .NET Framework 4.6 or higher is installed.
-            if (!PluginUtil.TestNetFrameworkVersion(executionContext, new Version(4, 6)))
+            if (!NetFrameworkUtil.Test(new Version(4, 6), executionContext))
             {
                 throw new Exception(StringUtil.Loc("MinimumNetFramework46"));
             }
@@ -179,7 +179,7 @@ namespace Agent.Plugins.Repository
                                 .ForEach(x =>
                                 {
                                     executionContext.Output(StringUtil.Loc("Deleting", x.LocalItem));
-                                    PluginUtil.Delete(x.LocalItem, cancellationToken);
+                                    IOUtil.Delete(x.LocalItem, cancellationToken);
                                 });
                         }
                     }
@@ -205,7 +205,7 @@ namespace Agent.Plugins.Repository
                                         .ForEach(x =>
                                         {
                                             executionContext.Output(StringUtil.Loc("Deleting", x.LocalItem));
-                                            PluginUtil.Delete(x.LocalItem, cancellationToken);
+                                            IOUtil.Delete(x.LocalItem, cancellationToken);
                                         });
                                 }
                             }
@@ -252,7 +252,7 @@ namespace Agent.Plugins.Repository
 
                 // Recreate the sources directory.
                 executionContext.Debug($"Deleting: '{sourcesDirectory}'.");
-                PluginUtil.DeleteDirectory(sourcesDirectory, cancellationToken);
+                IOUtil.DeleteDirectory(sourcesDirectory, cancellationToken);
                 Directory.CreateDirectory(sourcesDirectory);
 
                 // Create the workspace.
@@ -365,7 +365,7 @@ namespace Agent.Plugins.Repository
                             }
                             finally
                             {
-                                PluginUtil.DeleteFile(tempCleanFile);
+                                IOUtil.DeleteFile(tempCleanFile);
                             }
                         }
                     }
@@ -477,7 +477,7 @@ namespace Agent.Plugins.Repository
                                 .ForEach(x =>
                                 {
                                     executionContext.Output(StringUtil.Loc("Deleting", x.LocalItem));
-                                    PluginUtil.Delete(x.LocalItem, CancellationToken.None);
+                                    IOUtil.Delete(x.LocalItem, CancellationToken.None);
                                 });
                         }
                     }
@@ -503,7 +503,7 @@ namespace Agent.Plugins.Repository
                                         .ForEach(x =>
                                         {
                                             executionContext.Output(StringUtil.Loc("Deleting", x.LocalItem));
-                                            PluginUtil.Delete(x.LocalItem, CancellationToken.None);
+                                            IOUtil.Delete(x.LocalItem, CancellationToken.None);
                                         });
                                 }
                             }

@@ -417,7 +417,7 @@ namespace Agent.Plugins.Repository
             if (!await IsRepositoryOriginUrlMatch(executionContext, gitCommandManager, targetPath, repositoryUrl))
             {
                 // Delete source folder
-                PluginUtil.DeleteDirectory(targetPath, cancellationToken);
+                IOUtil.DeleteDirectory(targetPath, cancellationToken);
             }
             else
             {
@@ -505,7 +505,7 @@ namespace Agent.Plugins.Repository
                     {
                         //fall back
                         executionContext.Warning("Unable to run \"git clean -fdx\" and \"git reset --hard HEAD\" successfully, delete source folder instead.");
-                        PluginUtil.DeleteDirectory(targetPath, cancellationToken);
+                        IOUtil.DeleteDirectory(targetPath, cancellationToken);
                     }
                 }
             }
@@ -964,7 +964,7 @@ namespace Agent.Plugins.Repository
                 if (useClientCert && !string.IsNullOrEmpty(clientCertPrivateKeyAskPassFile) && !exposeCred)
                 {
                     executionContext.Debug("Remove git.sslkey askpass file.");
-                    PluginUtil.DeleteFile(clientCertPrivateKeyAskPassFile);
+                    IOUtil.DeleteFile(clientCertPrivateKeyAskPassFile);
                 }
             }
 
@@ -1041,7 +1041,7 @@ namespace Agent.Plugins.Repository
             string clientCertPrivateKeyAskPassFile = executionContext.TaskVariables.GetValueOrDefault("clientCertAskPass")?.Value;
             if (!string.IsNullOrEmpty(clientCertPrivateKeyAskPassFile))
             {
-                PluginUtil.DeleteFile(clientCertPrivateKeyAskPassFile);
+                IOUtil.DeleteFile(clientCertPrivateKeyAskPassFile);
             }
         }
 

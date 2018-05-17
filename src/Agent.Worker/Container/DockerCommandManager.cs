@@ -33,9 +33,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.Container
         public override void Initialize(IHostContext hostContext)
         {
             base.Initialize(hostContext);
-
-            var whichUtil = HostContext.GetService<IWhichUtil>();
-            DockerPath = whichUtil.Which("docker", true);
+            DockerPath = WhichUtil.Which("docker", true, Trace);
         }
 
         public async Task<DockerVersion> DockerVersion(IExecutionContext context)
@@ -167,7 +165,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.Container
             context.Command($"{DockerPath} {arg}");
 
             object outputLock = new object();
-            var processInvoker = HostContext.CreateService<IProcessInvoker>();
+            var processInvoker = HostContext.CreateProcessInvoker();
             processInvoker.OutputDataReceived += delegate (object sender, ProcessDataReceivedEventArgs message)
             {
                 if (!string.IsNullOrEmpty(message.Data))
@@ -210,7 +208,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.Container
             string arg = $"{command} {options}".Trim();
             context.Command($"{DockerPath} {arg}");
 
-            var processInvoker = HostContext.CreateService<IProcessInvoker>();
+            var processInvoker = HostContext.CreateProcessInvoker();
             processInvoker.OutputDataReceived += delegate (object sender, ProcessDataReceivedEventArgs message)
             {
                 context.Output(message.Data);
@@ -240,7 +238,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.Container
 
             List<string> output = new List<string>();
             object outputLock = new object();
-            var processInvoker = HostContext.CreateService<IProcessInvoker>();
+            var processInvoker = HostContext.CreateProcessInvoker();
             processInvoker.OutputDataReceived += delegate (object sender, ProcessDataReceivedEventArgs message)
             {
                 if (!string.IsNullOrEmpty(message.Data))

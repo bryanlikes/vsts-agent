@@ -216,7 +216,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.Handlers
             }
 
             // Invoke the process.
-            using (var processInvoker = HostContext.CreateService<IProcessInvoker>())
+            using (var processInvoker = HostContext.CreateProcessInvoker())
             {
                 processInvoker.OutputDataReceived += OnDataReceived;
                 processInvoker.ErrorDataReceived += OnDataReceived;

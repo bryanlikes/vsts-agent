@@ -48,7 +48,7 @@ namespace Agent.Plugins.Repository
             _cancellationToken = cancellationToken;
 
             // Find svn in %Path%
-            string svnPath = PluginUtil.Which("svn");
+            string svnPath = WhichUtil.Which("svn", trace: context);
 
             if (string.IsNullOrEmpty(svnPath))
             {
@@ -86,7 +86,7 @@ namespace Agent.Plugins.Repository
             if (cleanRepository)
             {
                 // A clean build has been requested
-                PluginUtil.DeleteDirectory(rootPath, _cancellationToken);
+                IOUtil.DeleteDirectory(rootPath, _cancellationToken);
                 Directory.CreateDirectory(rootPath);
             }
 
@@ -398,7 +398,7 @@ namespace Agent.Plugins.Repository
                 .ForAll(m =>
                 {
                     _context.Debug($@"Delete unmapped folder: '{m.Key}'");
-                    PluginUtil.DeleteDirectory(m.Key, CancellationToken.None);
+                    IOUtil.DeleteDirectory(m.Key, CancellationToken.None);
                 });
         }
 

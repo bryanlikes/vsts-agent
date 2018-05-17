@@ -132,7 +132,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.Handlers
             // Invoke the process.
             ExecutionContext.Debug($"{cmdExe} {cmdExeArgs}");
             ExecutionContext.Command($"{command} {arguments}");
-            using (var processInvoker = HostContext.CreateService<IProcessInvoker>())
+            using (var processInvoker = HostContext.CreateProcessInvoker())
             {
                 processInvoker.OutputDataReceived += OnOutputDataReceived;
                 if (failOnStandardError)

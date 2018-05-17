@@ -19,6 +19,7 @@ using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
 using Pipelines = Microsoft.TeamFoundation.DistributedTask.Pipelines;
+using Agent.Sdk;
 
 namespace Microsoft.VisualStudio.Services.Agent.Worker
 {
@@ -245,7 +246,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
 
             string powerShellExe = HostContext.GetService<IPowerShellExeUtil>().GetPath();
             string arguments = @"Write-Host ($PSVersionTable | Out-String)";
-            using (var processInvoker = HostContext.CreateService<IProcessInvoker>())
+            using (var processInvoker = HostContext.CreateProcessInvoker())
             {
                 processInvoker.OutputDataReceived += (object sender, ProcessDataReceivedEventArgs args) =>
                 {

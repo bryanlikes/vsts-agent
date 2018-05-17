@@ -318,7 +318,7 @@ namespace Microsoft.VisualStudio.Services.Agent
                 List<string> securityOut = new List<string>();
                 List<string> securityError = new List<string>();
                 object outputLock = new object();
-                using (var p = HostContext.CreateService<IProcessInvoker>())
+                using (var p = HostContext.CreateProcessInvoker())
                 {
                     p.OutputDataReceived += delegate (object sender, ProcessDataReceivedEventArgs stdout)
                     {
@@ -396,7 +396,7 @@ namespace Microsoft.VisualStudio.Services.Agent
                 List<string> securityOut = new List<string>();
                 List<string> securityError = new List<string>();
                 object outputLock = new object();
-                using (var p = HostContext.CreateService<IProcessInvoker>())
+                using (var p = HostContext.CreateProcessInvoker())
                 {
                     p.OutputDataReceived += delegate (object sender, ProcessDataReceivedEventArgs stdout)
                     {
@@ -468,7 +468,7 @@ namespace Microsoft.VisualStudio.Services.Agent
                 List<string> securityOut = new List<string>();
                 List<string> securityError = new List<string>();
                 object outputLock = new object();
-                using (var p = HostContext.CreateService<IProcessInvoker>())
+                using (var p = HostContext.CreateProcessInvoker())
                 {
                     p.OutputDataReceived += delegate (object sender, ProcessDataReceivedEventArgs stdout)
                     {
@@ -547,7 +547,7 @@ namespace Microsoft.VisualStudio.Services.Agent
                 List<string> securityError = new List<string>();
                 object outputLock = new object();
 
-                using (var p = HostContext.CreateService<IProcessInvoker>())
+                using (var p = HostContext.CreateProcessInvoker())
                 {
                     p.OutputDataReceived += delegate (object sender, ProcessDataReceivedEventArgs stdout)
                     {
@@ -610,7 +610,7 @@ namespace Microsoft.VisualStudio.Services.Agent
             List<string> securityOut = new List<string>();
             List<string> securityError = new List<string>();
             object outputLock = new object();
-            using (var p = HostContext.CreateService<IProcessInvoker>())
+            using (var p = HostContext.CreateProcessInvoker())
             {
                 p.OutputDataReceived += delegate (object sender, ProcessDataReceivedEventArgs stdout)
                 {
@@ -669,7 +669,7 @@ namespace Microsoft.VisualStudio.Services.Agent
             List<string> securityOut = new List<string>();
             List<string> securityError = new List<string>();
             object outputLock = new object();
-            using (var p = HostContext.CreateService<IProcessInvoker>())
+            using (var p = HostContext.CreateProcessInvoker())
             {
                 p.OutputDataReceived += delegate (object sender, ProcessDataReceivedEventArgs stdout)
                 {
@@ -905,7 +905,7 @@ namespace Microsoft.VisualStudio.Services.Agent
             if (!String.IsNullOrEmpty(chmodPath))
             {
                 var arguments = $"600 {new FileInfo(_credStoreFile).FullName}";
-                using (var invoker = HostContext.CreateService<IProcessInvoker>())
+                using (var invoker = HostContext.CreateProcessInvoker())
                 {
                     var exitCode = invoker.ExecuteAsync(IOUtil.GetRootPath(), chmodPath, arguments, null, default(CancellationToken)).GetAwaiter().GetResult();
                     if (exitCode == 0)

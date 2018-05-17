@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.Services.WebApi;
 using Pipelines = Microsoft.TeamFoundation.DistributedTask.Pipelines;
+using System.Net.Http.Headers;
 
 namespace Microsoft.VisualStudio.Services.Agent.Listener
 {
@@ -32,9 +33,10 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener
         {
             try
             {
+                var userAgent = new ProductInfoHeaderValue($"VstsAgentCore-{BuildConstants.AgentPackage.PackageName}", Constants.Agent.Version);
                 var agentWebProxy = HostContext.GetService<IVstsAgentWebProxy>();
                 var agentCertManager = HostContext.GetService<IAgentCertificateManager>();
-                ApiUtil.InitializeVssClientSettings(agentWebProxy, agentCertManager);
+                VssUtil.InitializeVssClientSettings(userAgent, agentWebProxy.WebProxy, agentCertManager.VssClientCertificateManager);
 
                 _inConfigStage = true;
                 _completedCommand.Reset();
