@@ -193,9 +193,9 @@ namespace Microsoft.VisualStudio.Services.Agent
                     AgentSettings settings = configurationStore.GetSettings();
                     ArgUtil.NotNull(settings, nameof(settings));
                     ArgUtil.NotNullOrEmpty(settings.WorkFolder, nameof(settings.WorkFolder));
-                    path = Path.Combine(
+                    path = Path.GetFullPath(Path.Combine(
                         GetDirectory(WellKnownDirectory.Root),
-                        settings.WorkFolder);
+                        settings.WorkFolder));
                     break;
 
                 default:

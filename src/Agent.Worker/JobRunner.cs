@@ -152,14 +152,14 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker
                 jobContext.Variables.Set(Constants.Variables.Agent.MachineName, Environment.MachineName);
                 jobContext.Variables.Set(Constants.Variables.Agent.Name, settings.AgentName);
                 jobContext.Variables.Set(Constants.Variables.Agent.OS, VarUtil.OS);
-                jobContext.Variables.Set(Constants.Variables.Agent.RootDirectory, IOUtil.GetWorkPath(HostContext));
+                jobContext.Variables.Set(Constants.Variables.Agent.RootDirectory, HostContext.GetDirectory(WellKnownDirectory.Work));
 #if OS_WINDOWS
                 jobContext.Variables.Set(Constants.Variables.Agent.ServerOMDirectory, Path.Combine(IOUtil.GetExternalsPath(), Constants.Path.ServerOMDirectory));
 #else
                 jobContext.Variables.Set(Constants.Variables.Agent.AcceptTeeEula, settings.AcceptTeeEula.ToString());
 #endif
-                jobContext.Variables.Set(Constants.Variables.Agent.WorkFolder, IOUtil.GetWorkPath(HostContext));
-                jobContext.Variables.Set(Constants.Variables.System.WorkFolder, IOUtil.GetWorkPath(HostContext));
+                jobContext.Variables.Set(Constants.Variables.Agent.WorkFolder, HostContext.GetDirectory(WellKnownDirectory.Work));
+                jobContext.Variables.Set(Constants.Variables.System.WorkFolder, HostContext.GetDirectory(WellKnownDirectory.Work));
 
                 string toolsDirectory = Environment.GetEnvironmentVariable("AGENT_TOOLSDIRECTORY") ?? Environment.GetEnvironmentVariable(Constants.Variables.Agent.ToolsDirectory);
                 if (string.IsNullOrEmpty(toolsDirectory))

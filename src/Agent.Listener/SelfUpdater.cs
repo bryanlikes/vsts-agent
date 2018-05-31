@@ -388,7 +388,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener
             string scriptName = "_update.sh";
 #endif
 
-            string updateScript = Path.Combine(IOUtil.GetWorkPath(HostContext), scriptName);
+            string updateScript = Path.Combine(HostContext.GetDirectory(WellKnownDirectory.Work), scriptName);
             if (File.Exists(updateScript))
             {
                 IOUtil.DeleteFile(updateScript);

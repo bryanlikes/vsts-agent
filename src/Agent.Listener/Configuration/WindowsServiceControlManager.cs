@@ -141,7 +141,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener.Configuration
             _windowsServiceHelper.GrantFullControlToGroup(agentRoot, groupName);
 
             // grant permssion for work folder
-            string workFolder = IOUtil.GetWorkPath(HostContext);
+            string workFolder = HostContext.GetDirectory(WellKnownDirectory.Work);
             Directory.CreateDirectory(workFolder);
             Trace.Info(StringUtil.Format("Set full access control to group for the folder {0}", workFolder));
             _term.WriteLine(StringUtil.Loc("GrantingFilePermissions", accountName));
@@ -155,7 +155,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Listener.Configuration
             Trace.Info(StringUtil.Format("Calculated unique group name {0}", groupName));
 
             // remove the group from the work folder
-            string workFolder = IOUtil.GetWorkPath(HostContext);
+            string workFolder = HostContext.GetDirectory(WellKnownDirectory.Work);
             if (Directory.Exists(workFolder))
             {
                 Trace.Info(StringUtil.Format($"Remove the group {groupName} for the folder {workFolder}."));

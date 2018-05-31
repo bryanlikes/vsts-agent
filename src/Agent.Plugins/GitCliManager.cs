@@ -225,10 +225,14 @@ namespace Agent.Plugins.Repository
         }
 
         // git submodule update --init --force [--recursive]
-        public async Task<int> GitSubmoduleUpdate(AgentTaskPluginExecutionContext context, string repositoryPath, string additionalCommandLine, bool recursive, CancellationToken cancellationToken)
+        public async Task<int> GitSubmoduleUpdate(AgentTaskPluginExecutionContext context, string repositoryPath, int fetchDepth, string additionalCommandLine, bool recursive, CancellationToken cancellationToken)
         {
             context.Debug("Update the registered git submodules.");
             string options = "update --init --force";
+            if (fetchDepth > 0)
+            {
+                options = options + $" --depth={fetchDepth}";
+            }
             if (recursive)
             {
                 options = options + " --recursive";

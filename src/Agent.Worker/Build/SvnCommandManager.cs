@@ -631,7 +631,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.Build
                 string arguments = FormatArgumentsWithDefaults(args);
                 _context.Command($@"{_svn} {arguments}");
                 await processInvoker.ExecuteAsync(
-                    workingDirectory: IOUtil.GetWorkPath(HostContext),
+                    workingDirectory: HostContext.GetDirectory(WellKnownDirectory.Work),
                     fileName: _svn,
                     arguments: arguments,
                     environment: null,
@@ -673,7 +673,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.Build
                 try
                 {
                     await processInvoker.ExecuteAsync(
-                        workingDirectory: IOUtil.GetWorkPath(HostContext),
+                        workingDirectory: HostContext.GetDirectory(WellKnownDirectory.Work),
                         fileName: _svn,
                         arguments: arguments,
                         environment: null,

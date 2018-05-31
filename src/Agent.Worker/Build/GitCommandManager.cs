@@ -54,7 +54,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.Build
         Task<int> GitSubmoduleReset(IExecutionContext context, string repositoryPath);
 
         // git submodule update --init --force [--recursive]
-        Task<int> GitSubmoduleUpdate(IExecutionContext context, string repositoryPath, string additionalCommandLine, bool recursive, CancellationToken cancellationToken);
+        Task<int> GitSubmoduleUpdate(IExecutionContext context, string repositoryPath, int fetchDepth, string additionalCommandLine, bool recursive, CancellationToken cancellationToken);
 
         // git submodule sync [--recursive]
         Task<int> GitSubmoduleSync(IExecutionContext context, string repositoryPath, bool recursive, CancellationToken cancellationToken);
@@ -311,11 +311,15 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.Build
             return await ExecuteGitCommandAsync(context, repositoryPath, "submodule", "foreach git reset --hard HEAD");
         }
 
-        // git submodule update --init --force [--recursive]
-        public async Task<int> GitSubmoduleUpdate(IExecutionContext context, string repositoryPath, string additionalCommandLine, bool recursive, CancellationToken cancellationToken)
+        // git submodule update --init --force [--depth=15] [--recursive]
+        public async Task<int> GitSubmoduleUpdate(IExecutionContext context, string repositoryPath, int fetchDepth, string additionalCommandLine, bool recursive, CancellationToken cancellationToken)
         {
             context.Debug("Update the registered git submodules.");
             string options = "update --init --force";
+            if (fetchDepth > 0)
+            {
+                options = options + $" --depth={fetchDepth}";
+            }
             if (recursive)
             {
                 options = options + " --recursive";
@@ -451,7 +455,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.Build
             context.Debug("Get git version.");
             Version version = null;
             List<string> outputStrings = new List<string>();
-            int exitCode = await ExecuteGitCommandAsync(context, IOUtil.GetWorkPath(HostContext), "version", null, outputStrings);
+            int exitCode = await ExecuteGitCommandAsync(context, HostContext.GetDirectory(WellKnownDirectory.Work), "version", null, outputStrings);
             context.Output($"{string.Join(Environment.NewLine, outputStrings)}");
             if (exitCode == 0)
             {
@@ -482,7 +486,7 @@ namespace Microsoft.VisualStudio.Services.Agent.Worker.Build
             context.Debug("Get git-lfs version.");
             Version version = null;
             List<string> outputStrings = new List<string>();
-            int exitCode = await ExecuteGitCommandAsync(context, IOUtil.GetWorkPath(HostContext), "lfs version", null, outputStrings);
+            int exitCode = await ExecuteGitCommandAsync(context, HostContext.GetDirectory(WellKnownDirectory.Work), "lfs version", null, outputStrings);
             context.Output($"{string.Join(Environment.NewLine, outputStrings)}");
             if (exitCode == 0)
             {
